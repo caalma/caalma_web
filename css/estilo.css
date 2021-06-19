@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Asap:wght@400;700&display=swap');
+
+* {font-family:'Asap', serif; }
+
+html {
+    height:100%;
+    background-image: linear-gradient(to bottom right, #bbf, #bfb);
+}
+body {
+    padding:3% 40px;
+    margin:0;
+    text-align:center;
+    display:flex;
+    justify-content:center;
+}
+
+header p {
+    color:#444;
+    text-align:center;
+}
