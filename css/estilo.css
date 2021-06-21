@@ -3,20 +3,58 @@
 * {font-family:'Asap', serif; }
 
 html {
-    height:100%;
-    background-image: linear-gradient(to bottom right, #bbf, #bfb);
+    background-image:linear-gradient(to right, #bf8, #aff);
 }
+html.error {
+    background-image:linear-gradient(to right, #fb8, #f8f);
+}
+
 body {
-    padding:0;
     margin:0;
     text-align:center;
     height:100vh;
     display:flex;
     justify-content:center;
-    align-items:center;
+    align-items:top;
 }
 
+header {
+    display:block;
+}
 header p {
     color:#444;
     text-align:center;
+}
+
+div#pagina {
+    padding:40px 0;
+    text-align:center;
+
+    width:100vw;
+}
+
+nav {
+    display:block;
+    width:80%;
+    text-align:left;
+    margin:auto;
+}
+ul {
+    padding:0;
+    margin:0;
+}
+ul li {
+    list-style:none;
+    padding:10px;
+    border-bottom:1px solid rgba(0,0,0,.3);
+}
+
+a {
+    text-decoration:none;
+    color:#088;
+    font-weight:bold;
+    padding:3px;
+}
+a:hover {
+    background-color:#fff;
 }
