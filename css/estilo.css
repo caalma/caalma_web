@@ -4,6 +4,7 @@
 
 html {
     background-image:linear-gradient(to right, #bf8, #aff);
+    width:100vw;
 }
 html.error {
     background-image:linear-gradient(to right, #fb8, #f8f);
@@ -12,10 +13,12 @@ html.error {
 body {
     margin:0;
     text-align:center;
-    height:100vh;
     display:flex;
     justify-content:center;
     align-items:top;
+    flex-direction: column;
+    min-height:100vh;
+    width:100%;
 }
 
 header {
@@ -27,10 +30,9 @@ header p {
 }
 
 div#pagina {
-    padding:40px 0;
+    padding:40px 0 100px 0;
     text-align:center;
-
-    width:100vw;
+    width:100%;
 }
 
 nav {
@@ -53,8 +55,24 @@ a {
     text-decoration:none;
     color:#088;
     font-weight:bold;
-    padding:3px;
+    padding:3px 6px;
+    border-radius:5px;
 }
 a:hover {
     background-color:#fff;
+}
+
+footer {
+    width:100%;
+    background-color:#345;
+    margin-top: auto;
+}
+footer * {
+    color:#fff;
+}
+footer a:hover {
+    background-color:rgba(0,0,0,.3);
+}
+footer .cnt {
+    padding:30px 20px 15px 20px;
 }
