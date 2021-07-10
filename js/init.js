@@ -26,6 +26,8 @@ $(window).on({
 				$('#update').html(G.cfg.update);
 			} 
 			
+			close_server('#exit');			
+			
 		});
 
 	},
