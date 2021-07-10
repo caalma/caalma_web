@@ -1,0 +1,19 @@
+---
+
+
+background_gradiente:
+  normal: ['#bf8', '#aff']
+  error: ['#fb8', '#f8f']
+  speed: 30
+    
+update: '2021-07-10 18:42:11'
+
+content: |
+  #### Cosas a compartir:
+
+  - [Natalicio emprendedor](https://caalma.github.io/natalicio-emprendedor/) Genera títulos, humorístico, para emprendimientos
+  - [CruzaPalabras](https://caalma.github.io/cruza_palabras/) Relaciona, azarozamente, una frase con las palabras de la base de datos
+  - [Colores en Hexadecimal con 3 signos](https://caalma.github.io/color_hexadecimal_3_signos/) Tabla de colores
+  - [Figuras del Tangram Chino](https://caalma.github.io/tangram_figuras/) Utilidad para visualizar figuras del Tangram y mostrar sus soluciones
+  - [Plantilla estática para página web](https://github.com/caalma/plantilla_pagina_estatica) Base simple para iniciar una web
+  - [Utilidades para Sublime-Text](https://github.com/caalma/sublime-text-package_utiles) Extensión con varias funcionalidades
