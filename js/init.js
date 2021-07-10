@@ -16,17 +16,16 @@ $(window).on({
 
 		yml_load('./cfg/general.yml', function(v){
 			G.cfg = v;
-			$('#content').html(marked(G.cfg.content));
-			$('#update').html(G.cfg.update);
-			
 			let html = $('html');
-			let colors;
-			if(html.hasClass('error')){
-				colors = G.cfg.background_gradiente.error;
-			}else{
-				colors = G.cfg.background_gradiente.normal;
-			}
+			let html_type = html.attr('id');
+			colors = G.cfg.background_gradiente[html_type];
 			rotating_gradient_background(html, colors, G.cfg.background_gradiente.speed);
+			
+			if(html_type == 'home'){
+				$('#content').html(marked(G.cfg.content));
+				$('#update').html(G.cfg.update);
+			} 
+			
 		});
 
 	},
