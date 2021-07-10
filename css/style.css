@@ -1,17 +1,6 @@
-@CHARSET "UTF-8";
-
 @import url('https://fonts.googleapis.com/css2?family=Asap:wght@400;700&display=swap');
-
-* {font-family:'Asap', serif; }
-
-html {
-    background-image:linear-gradient(to right, #bf8, #aff);
-    width:100vw;
-}
-html.error {
-    background-image:linear-gradient(to right, #fb8, #f8f);
-}
-
+* { font-family:'Asap', serif; }
+html { width:100vw; }
 body {
     margin:0;
     text-align:center;
@@ -22,10 +11,7 @@ body {
     min-height:100vh;
     width:100%;
 }
-
-header {
-    display:block;
-}
+header { display:block; }
 header p {
     color:#444;
     text-align:center;
@@ -36,8 +22,7 @@ div#pagina {
     text-align:center;
     width:100%;
 }
-
-nav {
+section {
     display:block;
     width:80%;
     text-align:left;
@@ -52,7 +37,6 @@ ul li {
     padding:10px;
     border-bottom:1px solid rgba(0,0,0,.3);
 }
-
 a {
     text-decoration:none;
     color:#088;
@@ -60,25 +44,15 @@ a {
     padding:3px 6px;
     border-radius:5px;
 }
-a:hover {
-    background-color:#fff;
-}
-
+a:hover { background-color:#fff; }
 footer {
     width:100%;
     background-color:#345;
     margin-top: auto;
 }
-footer * {
-    color:#fff;
-}
-footer a:hover {
-    background-color:rgba(0,0,0,.3);
-}
-footer .cnt {
-    padding:30px 20px 15px 20px;
-}
-
+footer * { color:#fff; }
+footer a:hover { background-color:rgba(0,0,0,.3); }
+footer .cnt { padding:30px 20px 15px 20px; }
 a.github_repositorio {
     position:fixed;
     bottom:5px;
@@ -93,6 +67,10 @@ a.github_repositorio {
     height:30px;
     background-color:transparent;
 }
-a.github_repositorio:hover {
-    opacity:1;
+a.github_repositorio:hover { opacity:1; }
+#exit {
+    position:fixed;
+    bottom:0;
+    right:0;
+    cursor:pointer;
 }
