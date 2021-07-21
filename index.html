@@ -13,7 +13,9 @@
     <link rel="stylesheet" type="text/css" href="./css/normalize.css">
     <link rel="stylesheet" type="text/css" href="./css/style.css">
 
-    <title>CAALMA.ar</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+    <title>caalma.ar</title>
 
 </head>
 <body>
@@ -25,7 +27,95 @@
         <br>
 
         <section id="content"></section>
+        <section id="comments">
+            <h4>¿ Querés dejar un comentario ?</h4>
+            <form id="form-comments" action="https://formspree.io/f/xqkwdnrg" method="POST">
+              <input type="email" name="email" placeholder="Email ..." required />
+              <textarea name="message" placeholder="Comentario ..." required ></textarea>
+              <div class="g-recaptcha" data-sitekey="6Lc2lrAbAAAAAFZeNNR3EEJdaU1f8eqSXBgNLHxf"></div>
+              <button id="form-comments-button">ENVIAR</button>
+              <p id="form-comments-status"></p>
+            </form>
+            <script>
+                var form = document.getElementById("form-comments");
+                
+                async function handleSubmit(event) {
+                  event.preventDefault();
+                  var status = document.getElementById("form-comments-status");
+                  var data = new FormData(event.target);
+                  fetch(event.target.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                  }).then(response => {
+                    status.innerHTML = "Gracias por tu comentario!";
+                    form.reset()
+                  }).catch(error => {
+                    status.innerHTML = ":( - Disculpa, pero sucedió un error en el envio!"
+                  });
+                }
+                form.addEventListener("submit", handleSubmit)
+
+                window.onload = function() { 
+                  var el = document.getElementById('g-recaptcha-response'); 
+                  if (el) { 
+                    el.setAttribute('required', 'required'); 
+                  } 
+                }
+            </script>
+            <style type="text/css">
+                #comments {
+                    margin:30px auto;
+                    padding: 20px;
+                    border-radius: 10px;
+                    background: rgba(0,0,0,.1);
+                }
+                #comments form {
+                    display: flex;
+                    align-content: center;
+                    justify-content: center;
+                    vertical-align: middle;
+                }
+                #comments h4 {
+                    text-align: center;
+                    color: rgba(0,0,0,.8);
+                }
+                #comments input,
+                #comments textarea,
+                #comments button {
+                    border: none;
+                    padding: 10px;
+                    border-radius: 10px;
+                    line-height: 1.2em;
+                    border: 1px solid #abcabc;
+                    margin:0 10px;
+                }
+                #comments button {
+                    background: rgba(0,0,0,.5);
+                    cursor: pointer;
+                    animation: all 1s ease;
+                    color: #fff;
+                }
+                #comments button:hover {
+                    background: rgba(0,0,0,.6);
+                }
+                #form-comments-status {
+                    padding: 10px;
+                    color: rgba(0,0,0,.7);
+                }
+                #g-recaptcha-response {
+                    display: block !important;
+                    position: absolute;
+                    margin: -50px 0 0 0 !important;
+                    z-index: -999999;
+                    opacity: 0;
+                }
+            </style>
+        </section>
     </div>
+
 
     <footer>
         <div class="cnt">
