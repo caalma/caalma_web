@@ -6,7 +6,7 @@ background_gradiente:
   error: ['#fb8', '#f8f']
   speed: 30
     
-update: '2021-07-21 20:53:51'
+update: '2021-07-29'
 
 content: |
   #### Contenidos:
@@ -18,3 +18,4 @@ content: |
   - [Plantilla estática para página web](https://github.com/caalma/plantilla_pagina_estatica) Base simple para iniciar una web.
   - [Tabla Comparativa](https://caalma.github.com/tabla_comparativa) Utilidad para comparar contenidos visualmente.
   - [Utilidades para Sublime-Text](https://github.com/caalma/sublime-text-package_utiles) Extensión con varias funcionalidades.
+  - [Referencia de tecnología web](https://caalma.github.io/referencia_tecnologia_web/) Ejemplos sobre HTML, CSS y Javascript.
