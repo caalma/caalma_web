@@ -1,6 +1,5 @@
 ---
 
-
 background_gradiente:
   home: ['#bf8', '#aff']
   error: ['#fb8', '#f8f']
