@@ -54,6 +54,4 @@ stack [
 
 Junto:
 
-```
 [Audio](./audio.mp3)
-```
