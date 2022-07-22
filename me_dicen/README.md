@@ -35,6 +35,7 @@ vos.
 Y talvez
 se refieran a mi.
 ```
+
 ---
 
 Fondo:
@@ -49,6 +50,10 @@ stack [
   , slow 3 $ s "frotado?" # n "1 .. 5"
 ] # gain "1.0 .. 0.0" # pan sine -- # silence
 ```
+---
 
 Junto:
+
+```
 [Audio](./audio.mp3)
+```
