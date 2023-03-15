@@ -1,32 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta name="HandheldFriendly" content="True"/>
-    <meta http-equiv="cleartype" content="on"/>
+    <head>
+        <script>
+         const lugares = {
+             '_': '/',
+             'm0': 'https://github.com/caalma/p_matem_nc',
+             'pmnc': 'https://github.com/caalma/p_matem_nc',
+         }
 
-    <link rel="alternate icon" type="image/png" href="../img/favicon.png">
-    <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+        </script>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+        <meta name="HandheldFriendly" content="True"/>
+        <meta http-equiv="cleartype" content="on"/>
 
-    <title>caalma.ar - redireccionador</title>
-    <style>
-     * {
-         font-family: monospace;
-         background: #444;
-         color: #afa;
-     }
-    </style>
-</head>
-<body>
-    <p>Serás redireccionado a: <span id="lugar"></span></p>
-    <script>
+        <link rel="alternate icon" type="image/png" href="../img/favicon.png">
+        <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
 
-     let lugar = document.getElementById('lugar');
-     let idl = location.href.hash;
-     lugar.innerText = idl;
+        <title>caalma.ar - redireccionador</title>
+        <style>
+         * { font-family:'Asap', serif; }
+         html { width:100vw; }
+         body {
+             background: #223;
+             color: #afa;
+             margin:0;
+             text-align:center;
+             display:flex;
+             justify-content:center;
+             align-items:top;
+             flex-direction: column;
+             min-height:100vh;
+             width:100%;
+         }
+         #lugar {
+             color:#faa;
+         }
+        </style>
+    </head>
+    <body>
+        <p>EN BREVE IRÁS A<br><strong id="lugar"></strong></p>
+        <script>
+         const lugar = document.getElementById('lugar');
+         let idl = String(document.location.hash).replace('#', '');
 
-    </script>
-</body>
+         if(!(idl in lugares)){ idl = '_'; }
+         lugar.innerText = lugares[idl];
+
+         setTimeout(
+             ()=>{ document.location.href = lugares[idl];},
+             2000);
+        </script>
+    </body>
 </html>
