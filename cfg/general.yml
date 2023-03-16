@@ -4,11 +4,11 @@ background_gradiente:
   home: ['#bf8', '#aff']
   error: ['#fb8', '#f8f']
   speed: 30
-    
-update: '2022-07-09'
+
+update: '2023-03-16'
 
 content: |
-  #### Contenidos:
+  #### Sumario:
 
   - [Colores en Hexadecimal con 3 signos](https://caalma.github.io/color_hexadecimal_3_signos/) Tabla de colores.
   - [CruzaPalabras](https://caalma.github.io/cruza_palabras/) Relaciona, azarozamente, una frase con las palabras de la base de datos.
