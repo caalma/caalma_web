@@ -1,0 +1,42 @@
+body {
+    overflow: hidden;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 0;
+}
+
+#data {
+    position: fixed;
+    bottom: 3vh;
+    left: 3vh;
+    width: 96vw;
+    padding: 10px;
+    color: #fff;
+    font-size: .8em;
+    text-shadow: 1px 1px 3px #000000;
+}
+
+#container {
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+}
+
+.draggable {
+    outline: 2px solid #fff;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: #666;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    transform: translate(-50%, -50%); /* Centrar el objeto */
+}
+
+.draggable.active {
+    background-color: #bbb;
+}
