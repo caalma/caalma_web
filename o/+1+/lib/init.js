@@ -11,7 +11,91 @@ function createDraggable(id, initialX, initialY) {
     return obj;
 }
 
+
 function dragElement(element, configItem) {
+    let posX = 0, posY = 0, startX = 0, startY = 0;
+
+    // Soporta tanto eventos de mouse como touch
+    element.onmousedown = dragMouseDown;
+    element.ontouchstart = dragTouchStart;
+
+    function dragMouseDown(e) {
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+        element.classList.add('active');
+    }
+
+    function dragTouchStart(e) {
+        e.preventDefault();
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        document.ontouchend = closeDragElement;
+        document.ontouchmove = elementTouchDrag;
+        element.classList.add('active');
+    }
+
+    function elementDrag(e) {
+        e.preventDefault();
+        posX = startX - e.clientX;
+        posY = startY - e.clientY;
+        startX = e.clientX;
+        startY = e.clientY;
+        element.style.top = (element.offsetTop - posY) + "px";
+        element.style.left = (element.offsetLeft - posX) + "px";
+        updateValues();
+    }
+
+    function elementTouchDrag(e) {
+        e.preventDefault();
+        posX = startX - e.touches[0].clientX;
+        posY = startY - e.touches[0].clientY;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        element.style.top = (element.offsetTop - posY) + "px";
+        element.style.left = (element.offsetLeft - posX) + "px";
+        updateValues();
+    }
+
+    function updateValues() {
+        const x = element.offsetLeft + element.offsetWidth / 2;
+        const y = element.offsetTop + element.offsetHeight / 2;
+        const containerWidth = document.getElementById('container').offsetWidth;
+        const containerHeight = document.getElementById('container').offsetHeight;
+
+        const normalizedX = Math.min(1, Math.max(0, x / containerWidth));
+        const normalizedY = Math.min(1, Math.max(0, y / containerHeight));
+
+        for (const [control, lambda] of Object.entries(configItem.controles)) {
+            const normalizedValue = lambda(normalizedX, normalizedY);
+
+            const range = configItem.max - configItem.min;
+            let value = configItem.min + normalizedValue * range;
+
+            value = Math.round(value / configItem.step) * configItem.step;
+
+            values[`${configItem.id}-${control}`] = value;
+
+            console.log(`${configItem.id}-${control} -> Valor: ${value}`);
+            document.getElementById('data').innerHTML = JSON.stringify(values);
+        }
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        document.ontouchend = null;
+        document.ontouchmove = null;
+        element.classList.remove('active');
+    }
+
+    updateValues();
+}
+
+
+function _dragElement(element, configItem) {
     let posX = 0, posY = 0, startX = 0, startY = 0;
 
     element.onmousedown = dragMouseDown;
@@ -73,6 +157,8 @@ function dragElement(element, configItem) {
 
     updateValues();
 }
+
+
 
 
 function actualizarGUI(){
