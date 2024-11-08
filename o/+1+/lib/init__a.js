@@ -15,7 +15,6 @@ function dragElement(element, configItem) {
     let posX = 0, posY = 0, startX = 0, startY = 0;
 
     element.onmousedown = dragMouseDown;
-    element.ontouchstart = dragTouchStart;
 
     function dragMouseDown(e) {
         e.preventDefault();
@@ -24,27 +23,6 @@ function dragElement(element, configItem) {
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
         element.classList.add('active');
-    }
-
-    function dragTouchStart(e) {
-        e.preventDefault();
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        document.ontouchend = closeDragElement;
-        document.ontouchmove = elementTouchDrag;
-        element.classList.add('active');
-    }
-
-
-    function elementTouchDrag(e) {
-        e.preventDefault();
-        posX = startX - e.touches[0].clientX;
-        posY = startY - e.touches[0].clientY;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        element.style.top = (element.offsetTop - posY) + "px";
-        element.style.left = (element.offsetLeft - posX) + "px";
-        updateValues();
     }
 
     function updateValues() {
@@ -84,15 +62,12 @@ function dragElement(element, configItem) {
         startY = e.clientY;
         element.style.top = (element.offsetTop - posY) + "px";
         element.style.left = (element.offsetLeft - posX) + "px";
-        updateValues();
+        updateValues()
     }
-
 
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
-        document.ontouchend = null;
-        document.ontouchmove = null;
         element.classList.remove('active');
     }
 
