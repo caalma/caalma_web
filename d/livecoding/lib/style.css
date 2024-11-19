@@ -7,6 +7,19 @@ body {
     color: #eee;
 }
 
-.verde {
-    color: #8f8;
+.verde { color: #8f8; }
+.naranja { color: #fa2; }
+
+ul {
+    padding: 0;
+    margin: 0;
+    li {
+        padding: 10px 0px;
+        list-style: none;
+
+    }
+}
+
+a {
+    color: #f88;
 }
