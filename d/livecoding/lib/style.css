@@ -1,0 +1,12 @@
+body {
+    overflow: hidden;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 30px;
+    background: #111;
+    color: #eee;
+}
+
+.verde {
+    color: #8f8;
+}
