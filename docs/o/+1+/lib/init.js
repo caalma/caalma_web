@@ -131,15 +131,20 @@ loadScript('./lib/hydra-extend-coord.js');
 loadScript('./lib/hydra-extend-combine.js');
 loadScript('./lib/hydra-extend-combinecoord.js');
 
-window.onload = () => {
+const arrancar = () => {
     visor.style.width = "100vw";
     visor.style.height = "100vh";
 
-    id_composicion = window.location.search.replace('?', '');
+    // index.html ya validó la imagen (?a … ?f) y la deja en window.ID_OBRA
+    id_composicion = window.ID_OBRA || window.location.search.replace('?', '');
     parametrosInit[id_composicion]();
 
     config.forEach(item => {
         const obj = createDraggable(item.id, item.initialX, item.initialY);
         dragElement(obj, item);
     });
-}
+};
+
+// index.html carga este archivo dinámicamente: según el momento, la página puede estar ya cargada
+if (document.readyState === 'complete') arrancar();
+else window.onload = arrancar;

@@ -1,0 +1,53 @@
+/* Estilos del menú de +1+ (sólo se carga cuando se muestra el menú) */
+body.menu {
+    overflow: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    background: #0b0d12;
+    color: #c9ced8;
+    font: 400 1rem/1.65 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.menu main {
+    width: min(100%, 40rem);
+    margin: auto;
+    padding: 2.2rem 1.3rem 2rem;
+}
+
+.menu header { text-align: center; margin-bottom: 1.6rem; }
+.menu h1 { margin: 0; font-size: clamp(2.6rem, 2rem + 4vw, 4rem); font-weight: 300; letter-spacing: .04em; color: #8b7cf6; }
+.menu .autoria { margin: .2rem 0 0; font-size: .8rem; letter-spacing: .08em; color: #6b7384; }
+
+.menu .texto p { margin: .9rem 0; }
+.menu strong { color: #e8ebf2; font-weight: 600; }
+
+.menu nav { margin-top: 1.8rem; }
+.menu .aviso { margin: 0 0 .3rem; color: #ffb454; }
+.menu .pie-menu { margin: 0 0 1rem; color: #6b7384; font-size: .9rem; }
+
+.menu .imagenes {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .8rem;
+}
+.menu .imagenes li { display: flex; }
+.menu .imagen {
+    display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: .9rem; align-items: center;
+    flex: 1; padding: .7rem .9rem;
+    color: inherit; text-decoration: none;
+    border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); border-radius: 12px;
+    background: color-mix(in srgb, var(--c) 6%, transparent);
+    transition: background .2s, border-color .2s;
+}
+.menu .imagen:hover, .menu .imagen:focus-visible {
+    background: color-mix(in srgb, var(--c) 18%, transparent);
+    border-color: var(--c);
+    outline: none;
+}
+.menu .letra { grid-row: 1 / 3; font-size: 2rem; line-height: 1; font-weight: 300; color: var(--c); }
+.menu .nombre { font-size: .9rem; line-height: 1.3; }
+.menu .imagen code { font-size: .75rem; color: #6b7384; }
+
+.menu footer { margin-top: 2.2rem; text-align: center; font-size: .8rem; color: #6b7384; }
+.menu footer a { color: #4aa8ff; text-decoration: none; }
+.menu footer a:hover { text-decoration: underline; text-underline-offset: .25em; }

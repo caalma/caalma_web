@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="author" content="caalma. Carlos Alberto Macheratti">
+        <meta name="description" content="+1+: obra impresa de seis imágenes con código QR. Cada QR abre acá la versión interactiva de su imagen.">
+        <meta name="color-scheme" content="dark">
         <title>...+1+...</title>
 
         <link rel="stylesheet" href="./lib/style.css">
@@ -12,8 +14,42 @@
         <canvas class="d-inline-block img-fluid" width="400px" height="400px" id="vcanvas"></canvas>
         <div id="data"></div>
         <div id="container"></div>
-        <script src="./lib/hydra-synth.js"></script>
-        <script src="./lib/composiciones.js"></script>
-        <script src="./lib/init.js"></script>
+        <noscript>
+            <p style="color:#ccc;padding:1em;font-family:monospace">
+                +1+ es una obra interactiva y necesita JavaScript para mostrarse.
+            </p>
+        </noscript>
+
+        <script>
+            /* Arranque de +1+.
+               La imagen se elige con la dirección:  ?a  ?b  ?c  ?d  ?e  ?f   (también #a, ?A o ?a&algo=1).
+               - Con una imagen válida se carga Hydra y la obra (como siempre).
+               - Sin imagen, o con una que no existe, se muestra el menú (lib/menu.js) y NO se descarga Hydra. */
+            (function () {
+                var cargar = function (src, alCargar, alFallar) {
+                    var s = document.createElement('script');
+                    s.src = src;
+                    s.async = false;                    /* conserva el orden de ejecución */
+                    if (alCargar) s.onload = alCargar;
+                    if (alFallar) s.onerror = alFallar;
+                    document.body.appendChild(s);
+                };
+                var crudo = location.search.slice(1) || location.hash.slice(1);
+                var id = decodeURIComponent(crudo.split(/[&=#]/)[0] || '').trim().toLowerCase();
+                window.ID_OBRA = id;                    /* lo usa lib/init.js */
+
+                cargar('./lib/composiciones.js', function () {
+                    if (id && Object.prototype.hasOwnProperty.call(parametrosInit, id)) {
+                        cargar('./lib/hydra-synth.js');
+                        cargar('./lib/init.js');
+                    } else {
+                        cargar('./lib/menu.js');
+                    }
+                }, function () {
+                    document.body.insertAdjacentHTML('beforeend',
+                        '<p style="color:#ccc;padding:1em;font-family:monospace">No se pudo cargar la obra. Probá recargar la página.</p>');
+                });
+            })();
+        </script>
     </body>
 </html>
