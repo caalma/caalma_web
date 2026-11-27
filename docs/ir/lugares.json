@@ -1,0 +1,53 @@
+{
+  "ajustes": {
+    "espera": 2000,
+    "predeterminado": "/"
+  },
+  "lugares": {
+    "m0": {
+      "url": "https://github.com/caalma/p_matematica_nc",
+      "titulo": "Matemática: repositorio principal",
+      "grupo": "matemáticas"
+    },
+    "m1": {
+      "url": "https://github.com/caalma/p_matematica_nc/blob/main/documentos/ensennar_matematica_en_diferentes_contextos_institucionales_disciplinares_y_profesionales___marcel_david_pochulu__conversaciones_ensennanza_aa.pdf",
+      "titulo": "Pochulu: Enseñar matemática en diferentes contextos (PDF)",
+      "grupo": "matemáticas"
+    },
+    "m2": {
+      "url": "https://github.com/caalma/p_matematica_nc/blob/main/documentos/sobre_ser_docente_en_matematicas__macheratti_carlos.pdf",
+      "titulo": "Macheratti: Sobre ser docente en matemáticas (PDF)",
+      "grupo": "matemáticas"
+    },
+    "m3": {
+      "url": "https://github.com/caalma/p_matematica_nc/blob/main/notas/2023-03-31__luis_caffarelli.md",
+      "titulo": "Notas: Luis Caffarelli, 2023-03-31",
+      "grupo": "matemáticas"
+    },
+    "mdoc": {
+      "url": "https://drive.google.com/drive/folders/1IzhcZiJkfqJCi3AX3DUBZtuLbKqWkAFW?usp=drive_link",
+      "titulo": "Matemática: documentos (Drive)",
+      "grupo": "matemáticas"
+    },
+    "m4": {
+      "url": "https://drive.google.com/drive/folders/14sTOHGKUN4FdxKsZ2WaJaOz-nCsy8Ehi?usp=drive_link",
+      "titulo": "Matemática: carpeta compartida (Drive)",
+      "grupo": "matemáticas"
+    },
+    "m5": {
+      "url": "https://colab.research.google.com/drive/1lKobD0oW3d1E3v9exSsibX74z55F8s7X?usp=sharing",
+      "titulo": "Matemática: cuaderno (Colab)",
+      "grupo": "matemáticas"
+    },
+    "audibles": {
+      "url": "https://github.com/caalma/audibles",
+      "titulo": "Audibles",
+      "grupo": "livecoding"
+    },
+    "lc": {
+      "url": "https://github.com/caalma/curso_ptav_estuary",
+      "titulo": "Curso de performance telemático y audiovisual en Estuary",
+      "grupo": "livecoding"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{# Artículo: título, metadatos, contenido Markdown y un índice automático de los títulos (2 y 3).
+   Datos de la página (base/datos/paginas/*.yml): titulo, resumen, fecha, autor, etiquetas, portada,
+   color, toc_nivel y  archivo: (Markdown en datos/)  ó  md: (inline). #}
+
+{% macro toc(items) %}<ol>{% for t in items %}<li><a href="#{{ t.id }}">{{ t.name }}</a>{% if t.children %}{{ toc(t.children) }}{% endif %}</li>{% endfor %}</ol>{% endmacro %}
+
+{% block body %}
+{% set d = doc(pag.md, pag.toc_nivel | default('2-3')) %}
+<span id="arriba"></span>
+<header class="cab">
+  <a class="logo" href="{{ cfg.base }}" aria-label="Ir al inicio"><img src="{{ cfg.base }}{{ cfg.cabecera.logo | default('rec/grafica/caalma_perfil.svg') }}" alt=""><span>{{ cfg.cabecera.nombre | default('') }}</span></a>
+  <nav aria-label="Principal">
+    <a href="{{ cfg.base }}">inicio</a>
+    {% for e in cfg.cabecera.enlaces | default([]) %}<a href="{{ e.url }}"{% if e.target %} target="{{ e.target }}" rel="noopener"{% endif %}>{{ e.titulo }}</a>
+    {% endfor %}<a href="#arriba" class="subir">↑ arriba</a>
+  </nav>
+  <i class="progreso"></i>
+</header>
+
+<div class="pagina" style="--acento: {{ pag.color | default(cfg.tema.paleta[0]) }}">
+  <article class="articulo">
+    <header class="encabezado">
+      <h1>{{ pag.titulo }}</h1>
+      {% if pag.resumen %}<p class="resumen">{{ pag.resumen }}</p>{% endif %}
+      <p class="meta">
+        {% if pag.fecha %}<time datetime="{{ pag.fecha }}">{{ pag.fecha | fecha }}</time>{% endif %}
+        {% if pag.autor %}<span>{{ pag.autor }}</span>{% endif %}
+        <span>≈ {{ d.lectura }} min de lectura</span>
+        {% for e in pag.etiquetas | default([]) %}<span class="etiqueta">{{ e }}</span>{% endfor %}
+      </p>
+    </header>
+    {% if pag.portada %}<figure class="portada"><img src="{{ cfg.base }}{{ pag.portada }}" alt="{{ pag.portada_alt | default('') }}"></figure>{% endif %}
+    {% if d.toc %}<details class="toc-plegable"><summary>Contenido</summary>{{ toc(d.toc) }}</details>{% endif %}
+    <div class="contenido">{{ d.html }}</div>
+    <footer class="pie-art"><a href="{{ cfg.base }}">← inicio</a><a href="#arriba">↑ arriba</a></footer>
+  </article>
+  {% if d.toc %}<aside class="toc-lateral" aria-label="Contenido"><p class="toc-titulo">Contenido</p>{{ toc(d.toc) }}</aside>{% endif %}
+</div>
+{% include 'partes/paneles.html' %}
+{% endblock %}

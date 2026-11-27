@@ -1,0 +1,12 @@
+---
+# Artículo: el lenguaje pila-web. El texto está en base/datos/articulos/pila-web.md
+titulo: 'pila-web, el lenguaje de la página'
+plantilla: 'articulo.html'
+salida: 'articulos/pila-web.html'
+archivo: 'articulos/pila-web.md'
+resumen: 'Un lenguaje diminuto de pila (RPN) con el que esta web se controla a sí misma: desde la barra de direcciones, desde un atributo HTML o desde un editor flotante. Sintaxis, palabras, ejemplos y cómo ampliarlo.'
+fecha: 2026-11-26
+autor: 'Caalma'
+etiquetas: [pila-web, rpn, javascript, lenguaje]
+color: '#4aa8ff'
+paneles: [ayuda, elementos]       # disponibles en esta página: ayuda.ABR y elementos.ABR

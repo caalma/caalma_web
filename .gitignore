@@ -1,1 +1,4 @@
-0_info.md
+venv/
+__pycache__/
+.docs_nuevo/
+*.pyc

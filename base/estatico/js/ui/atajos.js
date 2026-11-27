@@ -1,0 +1,21 @@
+// Atajos de teclado definidos en datos/sitio.yml (clave `atajos`): "Alt+u": "FIJ".
+// Cada valor es una expresión pila-web.
+export function iniciar(ctx) {
+  const codigo = (k) => /^[a-z]$/i.test(k) ? 'Key' + k.toUpperCase() : /^\d$/.test(k) ? 'Digit' + k : k;
+  const reglas = Object.entries(ctx.cfg.atajos || {}).map(([combo, expr]) => {
+    const partes = combo.split('+').map((x) => x.trim());
+    const tecla = partes.pop();
+    const mods = new Set(partes.map((m) => m.toLowerCase()));
+    return { ctrl: mods.has('ctrl'), alt: mods.has('alt'), shift: mods.has('shift'), meta: mods.has('meta'), code: codigo(tecla), expr };
+  });
+
+  window.addEventListener('keydown', (e) => {
+    for (const r of reglas) {
+      if (e.code === r.code && e.ctrlKey === r.ctrl && e.altKey === r.alt && e.shiftKey === r.shift && e.metaKey === r.meta) {
+        e.preventDefault();
+        ctx.vm.eval(r.expr, { evento: e });
+        return;
+      }
+    }
+  });
+}

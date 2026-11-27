@@ -1,0 +1,3 @@
+<ul class="cuerpo lista">
+{% for it in s['items'] %}  <li{% if it.clase %} class="{{ it.clase }}"{% endif %}><a href="{{ it.url }}"{% if it.target %} target="{{ it.target }}" rel="noopener"{% endif %}>{{ it.titulo }}</a>{% if it.nota %} <small>{{ it.nota }}</small>{% endif %}</li>
+{% endfor %}</ul>

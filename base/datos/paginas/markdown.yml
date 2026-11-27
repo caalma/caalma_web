@@ -1,0 +1,10 @@
+---
+# Artículo: guía de Markdown. El texto está en base/datos/articulos/markdown.md
+titulo: 'Markdown en los artículos: guía de sintaxis'
+plantilla: 'articulo.html'
+salida: 'articulos/markdown.html'
+archivo: 'articulos/markdown.md'
+resumen: 'Todo lo que se puede escribir en un artículo de esta web: texto, títulos, enlaces, imágenes, listas, código, tablas, avisos, notas al pie, HTML y plantillas, con el código fuente de cada ejemplo.'
+fecha: 2026-11-26
+autor: 'Caalma'
+etiquetas: [markdown, artículos, sintaxis]

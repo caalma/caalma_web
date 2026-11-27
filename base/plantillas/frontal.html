@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block body %}
+{# Cada sección vive en secciones/<tipo>.html: se puede crear un tipo nuevo sin tocar nada más. #}
+<div class="espacios" aria-hidden="true">
+{% for s in secciones %}  <div class="espacio" data-seccion="{{ s.id }}"></div>
+{% endfor %}</div>
+
+<main class="capas">
+{% for s in secciones %}
+  <section class="capa tipo-{{ s.tipo }}" id="{{ s.id }}" data-seccion="{{ s.id }}"
+           style="--acento: {{ s.color }}">
+    <div class="capa-in">
+      {% if s.mostrar_titulo | default(true) %}<h1 class="titulo">{{ s.titulo }}</h1>{% endif %}
+      {% include ['secciones/' ~ s.tipo ~ '.html', 'secciones/texto.html'] %}
+      {% if s.paneles | selectattr('boton') | list %}
+      <p class="opciones">
+        {% for p in s.paneles if p.boton %}<button type="button" data-pila-web-click="{{ p.id }}.ABR">{{ p.titulo }}</button>
+        {% endfor %}
+      </p>
+      {% endif %}
+    </div>
+  </section>
+{% endfor %}
+</main>
+
+<nav class="menu" aria-label="Secciones">
+  <ul>
+{% for s in secciones %}    <li style="--acento: {{ s.color }}">
+      <a href="#{{ s.id }}.IR" data-pila-web-click="{{ s.id }}.IR" data-seccion="{{ s.id }}">
+        <i></i><span class="t">{{ s.titulo }}</span>{% if s.resumen %}<span class="r">{{ s.resumen }}</span>{% endif %}
+      </a>
+    </li>
+{% endfor %}  </ul>
+</nav>
+
+{% include 'partes/paneles.html' %}
+{% endblock %}

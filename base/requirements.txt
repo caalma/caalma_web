@@ -1,0 +1,4 @@
+Jinja2>=3.1
+PyYAML>=6
+Markdown>=3.4
+Pygments>=2.15   # opcional: colores en los bloques de código (sin él salen sin colores)

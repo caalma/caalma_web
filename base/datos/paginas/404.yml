@@ -1,0 +1,10 @@
+---
+titulo: 'Caalma. 404: recurso no hallado'
+plantilla: 'simple.html'
+salida: '404.html'
+md: |
+  # ¡ Aquí no está !
+
+  Volviendo al inicio…
+
+  <script>setTimeout(() => { location.href = '{{ cfg.base }}'; }, 2000);</script>

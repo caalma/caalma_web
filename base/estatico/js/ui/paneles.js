@@ -1,0 +1,89 @@
+// Paneles superponibles: se apilan; Esc o clic afuera cierran el de arriba.
+// Manejan el foco de forma predecible: lo que queda debajo se vuelve inerte y
+// al cerrar el foco vuelve al elemento que lo abrió.
+export function iniciar(ctx) {
+  const velo = document.querySelector('.velo-paneles');
+  const pila = [];                                    // ids, el último es el de arriba
+  const abridores = new Map();                        // id -> elemento que tenía el foco
+  const panel = (id) => document.getElementById(id)?.classList.contains('panel') ? document.getElementById(id) : null;
+
+  function refrescar() {
+    ctx.estado.paneles = [...pila];
+    const hay = pila.length > 0;
+    document.querySelectorAll('.capas, .menu').forEach((e) => { e.inert = hay; });
+    document.querySelectorAll('.panel').forEach((p) => {
+      const i = pila.indexOf(p.id);
+      p.style.setProperty('--n', Math.max(i, 0));
+      p.inert = i !== pila.length - 1;                // sólo el de arriba es interactivo
+    });
+    if (velo) velo.hidden = !hay;
+    document.documentElement.classList.toggle('con-panel', hay);   // bloquea el scroll del fondo
+    ctx.bus.dispatchEvent(new CustomEvent('estado:paneles', { detail: [...pila] }));
+  }
+
+  function abrir(id) {
+    const p = panel(id);
+    if (!p) return console.warn('[paneles] no existe', id);
+    if (pila.includes(id)) pila.splice(pila.indexOf(id), 1);   // si ya estaba, sube al tope
+    else abridores.set(id, document.activeElement);
+    pila.push(id);
+    p.hidden = false;
+    refrescar();
+    if (!p.hasAttribute('tabindex')) p.tabIndex = -1;
+    requestAnimationFrame(() => {
+      p.classList.add('abierto');
+      if (p.contains(document.activeElement)) return;                   // ya lo enfocó un guion (id.ABR.campo.FOC)
+      (p.querySelector('.panel-in :is(a[href], button, input, select, textarea)') ?? p).focus?.({ preventScroll: true });
+    });
+  }
+
+  function cerrar(id) {
+    const i = pila.indexOf(id);
+    if (i < 0) return;
+    pila.splice(i, 1);
+    const p = panel(id);
+    p.classList.remove('abierto');
+    setTimeout(() => { if (!pila.includes(id)) p.hidden = true; }, 280);
+    refrescar();
+    if (i === pila.length) {                           // se cerró el de arriba: devolver el foco
+      const prev = abridores.get(id);
+      (pila.length ? panel(pila[pila.length - 1]) : prev)?.focus?.({ preventScroll: true });
+    }
+    abridores.delete(id);
+  }
+
+  const cerrarTodos = () => [...pila].reverse().forEach(cerrar);
+
+  // tamaño: pct = % de la ventana (1-100); 0 restaura el tamaño propio del panel
+  function tamano(id, pct) {
+    const p = panel(id);
+    if (!p) return console.warn('[paneles] no existe', id);
+    if (pct > 0) { p.style.setProperty('--pct', pct); p.dataset.max = pct; }
+    else { p.style.removeProperty('--pct'); delete p.dataset.max; }
+    const b = p.querySelector('.max');
+    if (b) { b.setAttribute('aria-pressed', pct > 0); b.textContent = pct > 0 ? '⤡' : '⤢'; b.setAttribute('aria-label', pct > 0 ? 'Restaurar' : 'Maximizar'); }
+  }
+  ctx.bus.addEventListener('orden:tamano', (e) => tamano(e.detail.id, e.detail.pct));
+  document.addEventListener('click', (e) => {              // botón ⤢ de la cabecera: alterna maximizado
+    const b = e.target.closest('.panel .max');
+    if (!b) return;
+    const p = b.closest('.panel');
+    tamano(p.id, p.dataset.max ? 0 : (ctx.cfg.panel_max || 95));
+  });
+
+  const POSICIONES = ['abajo', 'arriba', 'izquierda', 'derecha', 'centro'];
+  ctx.bus.addEventListener('orden:posicion', (e) => {
+    const p = panel(e.detail.id);
+    if (p && POSICIONES.includes(e.detail.pos)) p.dataset.pos = e.detail.pos;
+    else console.warn('[paneles] posición o panel no válido', e.detail);
+  });
+  ctx.bus.addEventListener('orden:abrir', (e) => abrir(e.detail.id));
+  ctx.bus.addEventListener('orden:cerrar', (e) => cerrar(e.detail.id));
+  ctx.bus.addEventListener('orden:cerrar-todos', cerrarTodos);
+  ctx.bus.addEventListener('orden:alternar', (e) => pila.includes(e.detail.id) ? cerrar(e.detail.id) : abrir(e.detail.id));
+
+  velo?.addEventListener('click', () => pila.length && cerrar(pila[pila.length - 1]));
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !e.altKey && pila.length) { e.preventDefault(); cerrar(pila[pila.length - 1]); }
+  });
+}

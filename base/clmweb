@@ -1,0 +1,347 @@
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+"""clmweb: genera, sirve y publica la web estática.
+
+Estructura:  <raíz>/base/ (este script, datos/, plantillas/, estatico/, clmlib/)  y  <raíz>/docs/ (lo que se publica).
+Se puede ejecutar desde cualquier carpeta.
+
+  ./base/clmweb update            regenera docs/ desde base/datos + base/plantillas + base/estatico
+  ./base/clmweb push ["mensaje"]  update + git add/commit/push (el repositorio git es la raíz)
+  ./base/clmweb open              sirve docs/ en local (regenera al detectar cambios) y abre el navegador
+  ./base/clmweb open --remoto     abre la web publicada
+"""
+import argparse, fnmatch, functools, hashlib, http.server, json, shutil, socketserver
+import re, subprocess, sys, threading, time, webbrowser
+from datetime import date, datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import yaml
+from jinja2 import ChoiceLoader, Environment, FileSystemLoader
+from markdown import Markdown
+
+BASE = Path(__file__).resolve().parent      # <raíz>/base : código, datos, plantillas y archivos estáticos
+RAIZ = BASE.parent                          # <raíz>      : repositorio git, docs/, README.md, LICENSE
+sys.path.insert(0, str(BASE))
+from clmlib import minificar            # noqa: E402
+from clmlib.resaltado import resaltar   # noqa: E402
+DATOS = BASE / 'datos'
+PLANTILLAS = BASE / 'plantillas'
+ESTATICO = BASE / 'estatico'
+SALIDA = RAIZ / 'docs'          # carpeta que GitHub Pages publica
+TEMPORAL = RAIZ / '.docs_nuevo' # se arma acá y se cambia por docs/ sólo si todo salió bien
+
+# Archivos de editores que nunca deben copiarse ni disparar una regeneración
+# (Emacs: .#x lock, #x# autoguardado, x~ respaldo; vim: .x.swp; macOS: .DS_Store)
+BASURA = ['.#*', '#*#', '*~', '.*.swp', '.*.swo', '*.swp', '.DS_Store', '__pycache__', '*.pyc', '4913']
+IGNORAR = shutil.ignore_patterns(*BASURA)
+
+
+def es_basura(ruta):
+    return any(fnmatch.fnmatch(ruta.name, pat) for pat in BASURA)
+
+
+def versiones():
+    """Huella de contenido de cada .js/.css de estatico/: sirve para romper la caché del navegador."""
+    out = {}
+    for p in sorted(ESTATICO.rglob('*')):
+        if p.is_file() and not es_basura(p) and p.suffix in ('.js', '.css'):
+            out[p.relative_to(ESTATICO).as_posix()] = hashlib.sha1(p.read_bytes()).hexdigest()[:8]
+    return out
+ZONA = 'America/Argentina/Buenos_Aires'
+
+# Claves de sitio.yml que cada página (base/datos/paginas/*.yml) puede sobreescribir.
+# Prioridad:  sitio.yml  <  plantillas.<plantilla> (también en sitio.yml)  <  la página.
+SOBREESCRIBIBLES = ('css', 'modulos_ui', 'modulos_pila_web', 'pila_web_inicio')
+
+MD_EXT = ['tables', 'attr_list', 'toc', 'abbr', 'footnotes', 'md_in_html',
+          'fenced_code', 'admonition', 'def_list', 'sane_lists']
+
+CONFIG_MD = {'toc': {}, 'footnotes': {'BACKLINK_TITLE': 'Volver a la nota %d en el texto'}}
+
+MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
+         'septiembre', 'octubre', 'noviembre', 'diciembre']
+
+
+def leer_yml(ruta):
+    with open(ruta, encoding='utf-8') as f:
+        return yaml.safe_load(f) or {}
+
+
+def fecha_es(v):
+    """2026-11-21 → '21 de noviembre de 2026' (filtro `fecha` de las plantillas)."""
+    if isinstance(v, str):
+        try:
+            v = date.fromisoformat(v)
+        except ValueError:
+            return v
+    if isinstance(v, datetime):
+        v = v.date()
+    return f'{v.day} de {MESES[v.month - 1]} de {v.year}' if isinstance(v, date) else str(v)
+
+
+def construir(optimizar=None):
+    cfg = leer_yml(DATOS / 'sitio.yml')
+    ahora = datetime.now(ZoneInfo(ZONA))
+    cfg['actualizacion'] = ahora.strftime('%Y-%m-%d %H:%M:%S')
+    cfg['cache'] = int(ahora.timestamp())
+    cfg.setdefault('panel_pos', 'abajo')
+    cfg.setdefault('menu', {}).setdefault('lado', 'izquierda')
+    cfg.setdefault('cabecera', {})
+    if optimizar is None:
+        optimizar = bool(cfg.get('optimizar_codigo'))
+
+    env = Environment(loader=FileSystemLoader(PLANTILLAS), autoescape=False)
+    env.filters['fecha'] = fecha_es
+
+    def md(texto):
+        """Markdown con plantillas Jinja dentro (permite {{ cfg.x }} en los .yml)."""
+        if not texto:
+            return ''
+        texto = env.from_string(texto).render(cfg=cfg)
+        return resaltar(Markdown(extensions=MD_EXT, extension_configs=CONFIG_MD).convert(texto))
+
+    def doc(texto, nivel='2-3'):
+        """Documento largo (artículos): html + árbol de títulos para el índice + tiempo de lectura."""
+        texto = env.from_string(texto or '').render(cfg=cfg)
+        config = {**CONFIG_MD, 'toc': {**CONFIG_MD['toc'], 'toc_depth': nivel, 'permalink': '#',
+                                         'permalink_class': 'ancla', 'permalink_title': 'Enlace a esta sección'}}
+        m = Markdown(extensions=MD_EXT, extension_configs=config)
+        cuerpo = resaltar(m.convert(texto))
+        palabras = len(re.findall(r'\w+', re.sub(r'```.*?```', '', texto, flags=re.S)))
+        return {'html': cuerpo, 'toc': m.toc_tokens, 'lectura': max(1, round(palabras / 200))}
+
+    def palabras_pila_web():
+        """Palabras del lenguaje agrupadas por módulo, leídas de la ayuda de cada .js (para documentarlas)."""
+        titulos = {'nucleo': 'Manejo de la pila', 'matematica': 'Operaciones matemáticas', 'texto': 'Operaciones de texto',
+                   'salida': 'Mostrar y devolver', 'ui': 'Página e interfaz'}
+        grupos = []
+        for mod in cfg.get('modulos_pila_web', []):
+            ruta = ESTATICO / 'js' / 'pila-web' / 'palabras' / f'{mod}.js'
+            if not ruta.exists():
+                continue
+            bloque = re.search(r'^  ayuda: \{\n(.*?)\n  \},', ruta.read_text(encoding='utf-8'), re.S | re.M)
+            filas = []
+            for linea in (bloque.group(1).split('\n') if bloque else []):
+                m = re.match(r"\s+([A-Z_][A-Z0-9_]*): '((?:[^'\\]|\\.)*)',?$", linea)
+                if m:
+                    texto = re.sub(r'\\(.)', r'\1', m.group(2))
+                    partes = re.split(r'\s{2,}', texto.strip(), maxsplit=1)
+                    filas.append({'nombre': m.group(1), 'efecto': partes[0], 'desc': partes[1] if len(partes) > 1 else ''})
+            grupos.append({'modulo': mod, 'titulo': titulos.get(mod, mod), 'palabras': filas})
+        return grupos
+
+    env.globals['md'] = md
+    env.globals['doc'] = doc
+    env.globals['palabras_pila_web'] = palabras_pila_web
+
+    vers = versiones()
+    env.globals['ver'] = lambda ruta: vers.get(ruta, '0')
+    # import map: todos los módulos JS (estáticos y dinámicos) se piden con su huella (?v=)
+    cfg['mapa_js'] = {'imports': {f"{cfg['base']}{r}": f"{cfg['base']}{r}?v={h}"
+                                  for r, h in vers.items() if r.endswith('.js')}}
+
+    # docs/ es 100% generado. Se arma aparte y recién al final reemplaza al anterior:
+    # si algo falla (un yml a medio escribir), el docs/ anterior queda intacto.
+    shutil.rmtree(TEMPORAL, ignore_errors=True)
+    try:
+        _generar(cfg, env, optimizar)
+        if SALIDA.exists():
+            shutil.rmtree(SALIDA)
+        TEMPORAL.rename(SALIDA)
+    finally:
+        shutil.rmtree(TEMPORAL, ignore_errors=True)
+    total = sum(p.stat().st_size for p in SALIDA.rglob('*') if p.is_file())
+    codigo = sum(p.stat().st_size for p in SALIDA.rglob('*')
+                 if p.is_file() and p.suffix in ('.html', '.css', '.js') and not p.relative_to(SALIDA).parts[0] in ('o', 'ir'))
+    print(f'  peso    docs/ {total / 1024:.0f} KB  (html+css+js propios: {codigo / 1024:.0f} KB)')
+    print(f'OK  {cfg["actualizacion"]}  →  {SALIDA.relative_to(RAIZ)}/')
+    return cfg
+
+
+def _generar(cfg, env, optimizar):
+    shutil.copytree(ESTATICO, TEMPORAL, ignore=IGNORAR, ignore_dangling_symlinks=True)
+    paleta = cfg['tema']['paleta']
+    por_plantilla = cfg.get('plantillas') or {}
+
+    def panel(item, color, boton):
+        """item: id (archivo base/datos/paneles/<id>.yml) o dict inline."""
+        if isinstance(item, str):
+            ruta_p = DATOS / 'paneles' / f'{item}.yml'
+            p = leer_yml(ruta_p) if ruta_p.exists() else {}
+            p.setdefault('id', item)
+        else:
+            p = dict(item)
+        p.setdefault('titulo', p['id'])
+        p.setdefault('boton', boton)          # ¿botón dentro de la sección?
+        p.setdefault('posicion', cfg['panel_pos'])
+        p['color'] = p.get('color') or color
+        return p
+
+    sitio = (cfg.get('urls') or {}).get('sitio', '').rstrip('/')
+    mapa = []
+    for ruta in sorted((DATOS / 'paginas').glob('*.yml')):
+        pag = leer_yml(ruta)
+        if 'archivo' in pag:                  # contenido Markdown aparte (datos/<archivo>)
+            pag['md'] = (DATOS / pag['archivo']).read_text(encoding='utf-8')
+
+        # configuración efectiva de esta página
+        cfgp = dict(cfg)
+        for fuente in (por_plantilla.get(pag['plantilla'], {}), pag):
+            cfgp.update({k: v for k, v in fuente.items() if k in SOBREESCRIBIBLES})
+
+        secciones = []
+        for i, sid in enumerate(pag.get('secciones', [])):
+            s = leer_yml(DATOS / 'secciones' / f'{sid}.yml')
+            s.setdefault('id', sid)
+            s.setdefault('tipo', 'texto')
+            s.setdefault('titulo', sid)
+            s['color'] = s.get('color') or paleta[i % len(paleta)]
+            s['paneles'] = [panel(x, s['color'], True) for x in s.get('paneles', [])]
+            secciones.append(s)
+        # paneles de la página (sin botón ni menú: se abren desde el lenguaje) + los de cada sección
+        todos = {}
+        for s in secciones:
+            for p in s['paneles']:
+                todos.setdefault(p['id'], p)
+        for x in pag.get('paneles', []):
+            p = panel(x, pag.get('color') or paleta[0], False)
+            todos.setdefault(p['id'], p)
+
+        salida = pag['salida']
+        ruta_url = '' if salida == 'index.html' else re.sub(r'index\.html$', '', salida)
+        url = f"{sitio}{cfg['base']}{ruta_url}"
+        ctx = {
+            'cfg': cfgp, 'pag': pag, 'secciones': secciones, 'paneles': list(todos.values()),
+            'url_pagina': url, 'descripcion': pag.get('resumen') or cfg['metadatos']['descripcion'],
+            # lo que el JS necesita saber (ver <script id="clm-config">)
+            'cliente': {
+                'base': cfg['base'],
+                'modulos_ui': cfgp['modulos_ui'],
+                'modulos_pila_web': cfgp['modulos_pila_web'],
+                'pila_web_inicio': cfgp.get('pila_web_inicio', ''),
+                'atajos': cfg.get('atajos', {}),
+                'panel_max': cfg.get('panel_max', 95),
+                'secciones': [{'id': s['id'], 'titulo': s['titulo']} for s in secciones],
+            },
+        }
+        html = env.get_template(pag['plantilla']).render(**ctx)
+        destino = TEMPORAL / salida
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        destino.write_text(html, encoding='utf-8')
+        print(f'  página  {salida}')
+        if pag.get('indexar', salida != '404.html'):
+            mapa.append((url, pag.get('fecha')))
+
+    if cfg.get('sitemap', True) and sitio:
+        if not (ESTATICO / 'sitemap.xml').exists():
+            filas = ''.join(f'<url><loc>{u}</loc><lastmod>{(f.isoformat() if isinstance(f, date) else str(f)) if f else cfg["actualizacion"][:10]}</lastmod></url>'
+                            for u, f in mapa)
+            (TEMPORAL / 'sitemap.xml').write_text(
+                f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{filas}</urlset>\n',
+                encoding='utf-8')
+        if not (ESTATICO / 'robots.txt').exists():
+            (TEMPORAL / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {sitio}{cfg["base"]}sitemap.xml\n', encoding='utf-8')
+
+    if optimizar:
+        antes, despues, avisos = minificar.optimizar(TEMPORAL, cfg.get('optimizar_excluir') or [])
+        print(f'  minificado  {antes / 1024:.1f} KB → {despues / 1024:.1f} KB  ({100 - 100 * despues / max(antes, 1):.0f}% menos)')
+        for a in avisos:
+            print('  AVISO', a)
+
+
+def git(*args):
+    return subprocess.run(['git', *args], cwd=RAIZ, check=True)
+
+
+def _opt(a):
+    return False if a.sin_optimizar else None      # None = lo que diga sitio.yml
+
+
+def cmd_update(a):
+    construir(_opt(a))
+
+
+def cmd_push(a):
+    construir(_opt(a))
+    try:
+        git('add', '-A')
+        # si no hay nada nuevo, commit devuelve 1: no es grave, igual se intenta el push
+        r = subprocess.run(['git', 'commit', '-m', a.mensaje], cwd=RAIZ)
+        if r.returncode not in (0, 1):
+            sys.exit(r.returncode)
+        # primera vez en una rama: sin upstream hay que pasar -u origin <rama>
+        tiene_upstream = subprocess.run(['git', 'rev-parse', '--abbrev-ref', '@{u}'], cwd=RAIZ,
+                                        capture_output=True).returncode == 0
+        git('push') if tiene_upstream else git('push', '-u', 'origin', 'HEAD')
+    except subprocess.CalledProcessError as e:
+        sys.exit(f'git falló ({" ".join(e.cmd)}). ¿Está configurado el remoto?  git remote -v')
+    except FileNotFoundError:
+        sys.exit('no se encontró git en el PATH')
+
+
+def _huella():
+    rutas = [*DATOS.rglob('*'), *PLANTILLAS.rglob('*'), *ESTATICO.rglob('*')]
+    return max((p.stat().st_mtime for p in rutas if p.is_file() and not es_basura(p)), default=0)
+
+
+def cmd_open(a):
+    if a.remoto:
+        cfg = leer_yml(DATOS / 'sitio.yml')
+        webbrowser.open(cfg['urls']['sitio'])
+        return
+    construir(_opt(a))
+    # los módulos ES no cargan con file://, por eso se sirve por http
+    class Manejador(http.server.SimpleHTTPRequestHandler):
+        def end_headers(self):                       # en local nada se cachea
+            self.send_header('Cache-Control', 'no-store')
+            super().end_headers()
+
+        def log_message(self, *a, **k):
+            pass
+
+    manejador = functools.partial(Manejador, directory=str(SALIDA))
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer(('127.0.0.1', a.puerto), manejador) as srv:
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        url = f'http://127.0.0.1:{a.puerto}/'
+        print(f'Sirviendo {url}   (Ctrl+C para salir)')
+        if not a.sin_navegador:
+            webbrowser.open(url)
+        visto = _huella()
+        try:
+            while True:
+                time.sleep(0.7)
+                h = _huella()
+                if h != visto:
+                    visto = h
+                    try:
+                        construir(_opt(a))
+                    except Exception as e:      # un yml a medio escribir no debe matar el servidor
+                        print('ERROR al regenerar:', e)
+        except KeyboardInterrupt:
+            print()
+
+
+def main():
+    p = argparse.ArgumentParser(prog='clmweb', description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest='cmd', required=True)
+    s = sub.add_parser('update', help='regenerar docs/')
+    s.set_defaults(fn=cmd_update)
+    s = sub.add_parser('push', help='regenerar y subir a GitHub')
+    s.add_argument('mensaje', nargs='?', default='actualización')
+    s.set_defaults(fn=cmd_push)
+    s = sub.add_parser('open', help='abrir en el navegador')
+    s.add_argument('--remoto', action='store_true', help='abrir la web publicada')
+    s.add_argument('--puerto', type=int, default=8000)
+    s.add_argument('--sin-navegador', action='store_true')
+    s.set_defaults(fn=cmd_open)
+    for x in sub.choices.values():
+        x.add_argument('--sin-optimizar', action='store_true', help='no minificar (aunque sitio.yml lo pida)')
+    a = p.parse_args()
+    a.fn(a)
+
+
+if __name__ == '__main__':
+    main()

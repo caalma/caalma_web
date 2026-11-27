@@ -1,0 +1,48 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {                       /* valores por defecto; datos/sitio.yml los redefine */
+  --fuente: 'Fira Code', ui-monospace, monospace;
+  --fondo: #0b0d12;
+  --texto: #c9ced8;
+  --tenue: #6b7384;
+  --acento: #8b7cf6;
+  --linea: rgba(255, 255, 255, .12);
+}
+
+html { scrollbar-gutter: stable; background: var(--fondo); scroll-behavior: auto; transition: background .6s; }
+body {
+  margin: 0;
+  font: 400 clamp(.92rem, .85rem + .3vw, 1.05rem)/1.7 var(--fuente);
+  color: var(--texto);
+  background: var(--fondo);
+  transition: background .6s, color .4s;
+  animation: entrar .9s ease both;
+}
+@keyframes entrar { from { opacity: 0; } }
+
+button, input, textarea, select { font: inherit; color: inherit; }
+a { color: var(--acento); text-decoration: none; text-underline-offset: .25em; transition: color .2s; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 1px solid var(--acento); outline-offset: 3px; border-radius: 3px; }
+
+h1, h2 { font-weight: 300; letter-spacing: -.02em; line-height: 1.2; }
+small { color: var(--tenue); }
+kbd { padding: .1em .45em; border: 1px solid var(--linea); border-radius: 4px; font-size: .85em; }
+/* imágenes de contenido: nunca desbordan la ventana (:where = especificidad 0, se pisan fácil) */
+:root { --img-alto: 60vh; }
+:where(.capa, .panel) img { max-width: 100%; max-height: var(--img-alto); width: auto; height: auto; object-fit: contain; }
+:where(.panel) img { --img-alto: 50vh; }
+.h1em { height: 1em; vertical-align: -.15em; }
+
+button { cursor: pointer; background: none; border: 1px solid color-mix(in srgb, var(--acento) 45%, transparent);
+  color: var(--acento); border-radius: 999px; padding: .35em 1.1em; transition: background .2s, color .2s; }
+button:hover { background: var(--acento); color: var(--fondo); }
+
+.simple { max-width: 40rem; margin: 20vh auto; padding: 0 1.5rem; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* con un panel abierto el fondo no se desplaza (clase puesta por ui/paneles.js) */
+html.con-panel { overflow: hidden; }

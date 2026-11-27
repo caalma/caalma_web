@@ -1,0 +1,99 @@
+# Configuración general del sitio.
+# Todo lo que está acá llega a las plantillas como `cfg`.
+---
+titulo: 'Caalma. Página personal'
+idioma: 'es'
+base: '/'                      # '/' con dominio propio; '/nombre-repo/' si se publica en github.io/nombre-repo/
+
+metadatos:
+  descripcion: 'Página personal y experimental. Caalma.'
+  claves: 'porfolio, exploraciones, diseño gráfico, expresión visual, expresión auditiva, código, programación'
+  dominio: 'caalma.net.ar'
+  imagen_compartir: 'rec/grafica/imagen_compartir.svg'
+  favicon: 'favicon.svg'
+
+urls:
+  sitio: 'https://caalma.net.ar'
+  repositorio: 'https://github.com/caalma/caalma_web'
+
+# Tema: se vuelca como variables CSS (:root). Desde el lenguaje se
+# puede cambiar cualquiera en vivo:   ~ffcc00.acento.VAR   o   fondo.~101820.VAR
+tema:
+  fuente: "'Fira Code', ui-monospace, monospace"
+  fondo: '#0b0d12'
+  texto: '#c9ced8'
+  tenue: '#6b7384'
+  velo: 'rgba(8, 10, 15, 0.86)'
+  # los colores se reparten entre las secciones en orden (ciclo)
+  paleta: ['#8b7cf6', '#4fd18b', '#4aa8ff', '#ff6b6b', '#ffb454', '#e879c9']
+
+menu:
+  lado: 'izquierda'            # 'izquierda' | 'derecha'  (se despliega sólo sobre las líneas finas)
+
+panel_pos: 'abajo'             # posición por defecto de los paneles: abajo | arriba | izquierda | derecha | centro
+
+panel_max: 95                  # % de la ventana que ocupa un panel al maximizarlo (botón ⤢ del panel)
+
+# Atajos de teclado: combinación → expresión pila-web. Alt+Enter (evaluar) vive en el editor.
+atajos:
+  'Alt+Escape': 'EDT'          # mostrar/ocultar el editor
+  'Alt+u': 'FIJ'               # fijar el estado actual en la URL
+
+# Fuentes externas opcionales (CSS). Vacío = sólo la instalada en el sistema.
+fuentes_css:
+  - 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap'
+
+# ---- Módulos (cada uno se puede quitar, reordenar o reemplazar) ----
+css:                           # hojas dentro de estatico/css/
+  - base
+  - capas
+  - menu
+  - codigo
+  - paneles
+  - flotantes
+
+modulos_ui:                    # estatico/js/ui/<nombre>.js  (export function iniciar(ctx))
+  - capas
+  - menu
+  - paneles
+  - eventos
+  - atajos
+  - editor
+  - pila
+
+modulos_pila_web:                   # estatico/js/pila-web/palabras/<nombre>.js
+  - nucleo
+  - matematica
+  - texto
+  - salida
+  - ui
+
+# ---- Valores por plantilla ----
+# Prioridad:  sitio.yml  <  plantillas.<plantilla>  <  la propia página (base/datos/paginas/*.yml).
+# Una página puede sobreescribir: css, modulos_ui, modulos_pila_web y pila_web_inicio.
+plantillas:
+  simple.html:
+    css: [base]
+  articulo.html:
+    css: [base, codigo, paneles, flotantes, articulo]
+    modulos_ui: [paneles, eventos, atajos, editor, pila, articulo]
+
+# Cabecera fija de las páginas tipo artículo
+cabecera:
+  logo: 'rec/grafica/caalma_perfil.svg'
+  nombre: 'caalma'
+  enlaces: []                  # extras: [{titulo: 'github', url: 'https://...'}]
+
+# ---- Publicación ----
+sitemap: true                  # genera sitemap.xml y robots.txt (si no existen en estatico/)
+
+# Minifica el html, css y js que se publican en docs/ (todos, cada vez que se regenera).
+# Conservador: quita comentarios y espacios, no renombra nada. Con `node` instalado cada js
+# minificado se verifica y, si falla, se publica el original.   ./base/clmweb update --sin-optimizar la saltea
+optimizar_codigo: true
+optimizar_excluir:             # patrones relativos a docs/ (los *.min.* ya se saltean solos)
+  - 'o/*'                      # experimentos viejos / librerías de terceros
+  - 'ir/*'
+
+# Script pila-web que corre siempre al iniciar, ANTES del script de la URL.
+pila_web_inicio: ''

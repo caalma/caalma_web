@@ -1,0 +1,22 @@
+// Utilidades compartidas por las ventanas flotantes.
+export function arrastrable(caja, asa) {
+  let d = null;
+  asa.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    const r = caja.getBoundingClientRect();
+    d = { x: e.clientX - r.left, y: e.clientY - r.top };
+    asa.setPointerCapture(e.pointerId);
+  });
+  asa.addEventListener('pointermove', (e) => {
+    if (!d) return;
+    caja.style.left = Math.max(0, Math.min(innerWidth - 40, e.clientX - d.x)) + 'px';
+    caja.style.top = Math.max(0, Math.min(innerHeight - 30, e.clientY - d.y)) + 'px';
+    caja.style.right = caja.style.bottom = 'auto';
+  });
+  asa.addEventListener('pointerup', () => { d = null; });
+}
+
+export function formatear(v) {
+  if (v instanceof Element) return `<${v.tagName.toLowerCase()}${v.id ? '#' + v.id : ''}>`;
+  return String(v);
+}

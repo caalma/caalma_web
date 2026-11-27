@@ -1,0 +1,19 @@
+---
+titulo: 'Caalma. Web personal'
+plantilla: 'frontal.html'      # plantillas/frontal.html
+salida: 'index.html'
+# Orden de aparición. Para intercalar, mover una línea. Para ocultar, comentarla.
+secciones:
+  - portada
+  - utiles
+  - divertimentos
+  - exploraciones
+  - participacion
+  - contactos
+  - creditos
+
+# Paneles sin botón y sin menú: se abren desde el lenguaje (ej: ayuda.ABR).
+# Cada id es un archivo base/datos/paneles/<id>.yml
+paneles:
+  - ayuda
+  - elementos

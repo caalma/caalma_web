@@ -1,0 +1,7 @@
+---
+titulo: 'Portada'
+tipo: 'texto'
+mostrar_titulo: false
+resumen: 'inicio'
+md: |
+  ![Caalma]({{ cfg.base }}rec/grafica/caalma_perfil.svg)

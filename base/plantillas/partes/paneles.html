@@ -1,0 +1,9 @@
+<div class="velo-paneles" hidden></div>
+{% for p in paneles %}
+<aside class="panel" id="{{ p.id }}" role="dialog" aria-label="{{ p.titulo }}" data-pos="{{ p.posicion }}" hidden
+       style="--acento: {{ p.color }}{% if p.ancho %}; --ancho: {{ p.ancho }}{% endif %}">
+  <header><h2>{{ p.titulo }}</h2>
+    <span class="botones"><button type="button" class="max" aria-label="Maximizar" aria-pressed="false">⤢</button><button type="button" data-pila-web-click="{{ p.id }}.CER" aria-label="Cerrar">×</button></span></header>
+  <div class="panel-in">{% with s = p %}{% include ['secciones/' ~ (p.tipo | default('texto')) ~ '.html', 'secciones/texto.html'] %}{% endwith %}</div>
+</aside>
+{% endfor %}

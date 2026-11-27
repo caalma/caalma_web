@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="{{ cfg.idioma }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{ pag.titulo }}</title>
+  <meta name="description" content="{{ descripcion }}">
+  <meta name="keywords" content="{{ cfg.metadatos.claves }}">
+  {% if pag.autor %}<meta name="author" content="{{ pag.autor }}">{% endif %}
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="{{ cfg.tema.fondo }}">
+  <link rel="canonical" href="{{ url_pagina }}">
+  <meta property="og:type" content="{{ 'article' if pag.fecha else 'website' }}">
+  <meta property="og:title" content="{{ pag.titulo }}">
+  <meta property="og:description" content="{{ descripcion }}">
+  <meta property="og:url" content="{{ url_pagina }}">
+  <meta property="og:image" content="{{ cfg.urls.sitio }}/{{ cfg.metadatos.imagen_compartir }}">
+  <meta property="og:site_name" content="{{ cfg.metadatos.dominio }}">
+  <meta property="og:locale" content="es_AR">
+  <link rel="icon" href="{{ cfg.base }}{{ cfg.metadatos.favicon }}">
+{% for u in cfg.fuentes_css %}  <link rel="stylesheet" href="{{ u }}">
+{% endfor %}
+  <style>
+    :root {
+{% for k, v in cfg.tema.items() if k != 'paleta' %}      --{{ k }}: {{ v }};
+{% endfor %}{% for c in cfg.tema.paleta %}      --p{{ loop.index }}: {{ c }};
+{% endfor %}    }
+  </style>
+{% for c in cfg.css %}  <link rel="stylesheet" href="{{ cfg.base }}css/{{ c }}.css?v={{ ver('css/' ~ c ~ '.css') }}">
+{% endfor %}
+  <noscript><style>.capa,.panel{position:static!important;opacity:1!important;visibility:visible!important}.espacios,.menu{display:none}</style></noscript>
+</head>
+<body class="menu-{{ 'der' if cfg.menu.lado == 'derecha' else 'izq' }} {{ pag.clase_body | default('') }}">
+{% block body %}{% endblock %}
+{% block datos_cliente %}
+<script type="application/json" id="clm-config">{{ cliente | tojson }}</script>
+<script type="importmap">{{ cfg.mapa_js | tojson }}</script>
+<script type="module" src="{{ cfg.base }}js/init.js?v={{ ver('js/init.js') }}"></script>
+{% endblock %}
+</body>
+</html>

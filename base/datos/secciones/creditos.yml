@@ -1,0 +1,13 @@
+---
+titulo: 'Créditos'
+tipo: 'texto'
+mostrar_titulo: false
+resumen: 'data'
+md: |
+  Caalma - Carlos Alberto Macheratti.
+
+  <small>Web actualizada el {{ cfg.actualizacion }}.</small>
+
+  Licencia [MIT]({{ cfg.urls.repositorio }}/blob/HEAD/LICENSE).
+
+  Disponible en [Github ![]({{ cfg.base }}rec/grafica/github_face.svg){.h1em}]({{ cfg.urls.repositorio }}).

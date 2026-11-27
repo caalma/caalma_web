@@ -1,0 +1,27 @@
+/* Bloques de código (los genera clmlib/resaltado.py) y colores de las categorías. Usa la paleta (--p1…--p6). */
+.codigo { position: relative; margin: 1.5rem 0; overflow: hidden; border: 1px solid var(--linea); border-radius: 10px;
+  background: color-mix(in srgb, var(--fondo) 86%, white 5%); }
+.codigo figcaption { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .25rem .6rem .25rem .9rem;
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--tenue); border-bottom: 1px solid var(--linea); }
+.codigo pre { margin: 0; padding: .9rem 1rem; overflow-x: auto; font-size: .85rem; line-height: 1.65; tab-size: 4; }
+.codigo code { padding: 0; background: none; color: var(--texto); font: inherit; }
+.codigo .copiar { padding: .1em .6em; border: 0; border-radius: 4px; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--tenue); }
+.codigo .copiar:hover { background: none; color: var(--acento); }
+.codigo > .copiar { position: absolute; top: .35rem; right: .5rem; }
+
+.codigo [class^="t-c"] { color: var(--tenue); font-style: italic; }          /* comentarios */
+.codigo [class^="t-k"] { color: var(--p1); }                                  /* palabras clave */
+.codigo [class^="t-s"] { color: var(--p2); }                                  /* textos */
+.codigo [class^="t-m"] { color: var(--p5); }                                  /* números */
+.codigo [class^="t-n"] { color: var(--texto); }                               /* nombres */
+.codigo .t-nf, .codigo .t-fm, .codigo .t-nb, .codigo .t-bp { color: var(--p3); }  /* funciones, builtins */
+.codigo .t-nc, .codigo .t-nn, .codigo .t-nd, .codigo .t-nt { color: var(--p6); }  /* clases, módulos, decoradores, tags */
+.codigo .t-na, .codigo .t-nv { color: var(--p5); }                            /* atributos, variables */
+.codigo .t-se { color: var(--p5); }                                           /* escapes */
+.codigo .t-o, .codigo .t-ow { color: var(--p1); }                             /* operadores */
+.codigo .t-p { color: var(--tenue); }                                         /* puntuación */
+.codigo .t-err { color: var(--p4); }
+
+/* código en línea (fuera de los bloques) */
+:not(pre) > code { padding: .1em .4em; border-radius: 4px; font-size: .9em; color: var(--p5);
+  background: color-mix(in srgb, var(--p5) 12%, transparent); }

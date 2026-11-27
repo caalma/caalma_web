@@ -1,0 +1,48 @@
+// Secciones apiladas: el scroll de la página (alto = n × 100vh) decide cuál es la visible.
+export function iniciar(ctx) {
+  const capas = [...document.querySelectorAll('.capa')];
+  const ids = capas.map((c) => c.dataset.seccion);
+  if (!capas.length) return;
+  let actual = -1;
+
+  const limitar = (i) => Math.max(0, Math.min(capas.length - 1, i));
+  const indiceScroll = () => limitar(Math.round(window.scrollY / window.innerHeight));
+
+  function mostrar(i) {
+    if (i === actual) return;
+    actual = i;
+    capas.forEach((c, k) => {
+      c.dataset.pos = k < i ? 'pasada' : k > i ? 'futura' : 'actual';
+      c.inert = k !== i;                       // sólo la visible recibe foco/clics
+    });
+    ctx.estado.capa = ids[i];
+    ctx.bus.dispatchEvent(new CustomEvent('estado:capa', { detail: { id: ids[i], indice: i } }));
+  }
+
+  function ir(i, suave = true) {
+    i = limitar(i);
+    mostrar(i);                                // estado inmediato: el guion puede leer CAPA enseguida
+    window.scrollTo({ top: i * window.innerHeight, behavior: suave ? 'smooth' : 'instant' });
+  }
+
+  ctx.bus.addEventListener('orden:ir', (e) => {
+    const i = ids.indexOf(e.detail.id);
+    if (i >= 0) ir(i, e.detail.suave); else console.warn('[capas] no existe la sección', e.detail.id);
+  });
+  ctx.bus.addEventListener('orden:ir-rel', (e) => ir(actual + e.detail.d));
+
+  window.addEventListener('scroll', () => mostrar(indiceScroll()), { passive: true });
+  window.addEventListener('resize', () => window.scrollTo({ top: actual * window.innerHeight, behavior: 'instant' }));
+
+  // teclado (sólo si no se está escribiendo ni hay paneles abiertos)
+  window.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.altKey || e.metaKey || ctx.estado.paneles.length) return;
+    if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+    const mapa = { ArrowDown: 1, PageDown: 1, ArrowUp: -1, PageUp: -1 };
+    if (e.key in mapa) { e.preventDefault(); ir(actual + mapa[e.key]); }
+    else if (e.key === 'Home') { e.preventDefault(); ir(0); }
+    else if (e.key === 'End') { e.preventDefault(); ir(capas.length - 1); }
+  });
+
+  mostrar(indiceScroll());
+}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  REDIRECCIONADOR de atajos.   /ir/#m0   ·   /ir/?m0   ·   /ir/#M0 (no distingue mayúsculas)
+
+  Toda la lógica y el aspecto viven en este archivo. Los destinos están en lugares.json (misma carpeta):
+
+    {
+      "ajustes": {
+        "espera": 2000,                 milisegundos antes de saltar (0 = salta enseguida)
+        "predeterminado": "/"           destino del atajo "_" (y del enlace «Ir al inicio»)
+      },
+      "lugares": {
+        "id": { "url": "https://...", "titulo": "Texto visible", "grupo": "Rótulo de agrupación" },
+        "otro": "https://..."           forma corta: sólo la URL
+      }
+    }
+
+  - "titulo" y "grupo" son opcionales. Sin hash o con un id que no existe se muestra la lista de atajos.
+  - Sólo se aceptan URLs que empiecen con http://, https:// o "/".  JSON no admite comentarios.
+  - Al probar en local usá un servidor (./base/clmweb open): fetch no funciona desde file://.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0d12">
+<title>Atajos</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" type="image/png" href="/favicon.png">
+<style>
+  :root { --fondo: #0b0d12; --texto: #c9ced8; --tenue: #6b7384; --linea: rgba(255, 255, 255, .12);
+          --acento: #8b7cf6; --destino: #4aa8ff; }
+  * { box-sizing: border-box; }
+  html { background: var(--fondo); }
+  body {
+    margin: 0; min-height: 100vh; min-height: 100dvh; padding: 2rem 1.2rem;
+    display: flex; flex-direction: column;                 /* main con margin:auto: centrado si es corto, arriba si es largo */
+    font: 400 1rem/1.6 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: var(--texto); background: var(--fondo);
+  }
+  main { width: min(100%, 38rem); margin: auto; text-align: center; }
+  a { color: var(--destino); text-decoration: none; overflow-wrap: anywhere; }
+  a:hover { text-decoration: underline; text-underline-offset: .25em; }
+  :focus-visible { outline: 1px solid var(--acento); outline-offset: 3px; border-radius: 3px; }
+  h1 { margin: .2rem 0 .4rem; font-size: clamp(1.3rem, 1rem + 2vw, 1.9rem); font-weight: 400; line-height: 1.3; }
+  .pre, .url, .aviso, small { color: var(--tenue); }
+  .pre { margin: 0; font-size: .8rem; letter-spacing: .18em; }
+  .url { margin: 0 0 1.6rem; font-size: .8rem; overflow-wrap: anywhere; }
+  .aviso { margin: 0 0 1.4rem; color: #ffb454; }
+  .error { color: #ff6b6b; }
+
+  .barra { height: 2px; margin: 0 auto 1.6rem; max-width: 18rem; background: var(--linea); overflow: hidden; }
+  .barra i { display: block; width: 0; height: 100%; background: var(--acento); animation: llenar linear forwards; }
+  @keyframes llenar { to { width: 100%; } }
+  .cancelada .barra { display: none; }
+  @media (prefers-reduced-motion: reduce) { .barra { display: none; } }
+
+  .acciones { display: flex; justify-content: center; flex-wrap: wrap; gap: .7rem; margin: 0; }
+  .boton, button {
+    font: inherit; font-size: .85rem; cursor: pointer; padding: .35em 1.2em; border-radius: 999px; text-decoration: none;
+    color: var(--acento); background: none; border: 1px solid color-mix(in srgb, var(--acento) 45%, transparent);
+  }
+  .boton:hover, button:hover { background: var(--acento); color: var(--fondo); text-decoration: none; }
+
+  .lista { text-align: left; margin-top: 1.6rem; }
+  .lista h2 { margin: 1.8rem 0 .4rem; font-size: .75rem; font-weight: 400; letter-spacing: .15em; text-transform: uppercase; color: var(--acento); }
+  .lista ul { list-style: none; margin: 0; padding: 0; }
+  .lista li { display: flex; align-items: baseline; gap: .8rem; padding: .45rem 0; border-bottom: 1px solid var(--linea); }
+  .lista li a { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .lista small { overflow-wrap: anywhere; }
+  .lista code { flex: none; font-size: .75rem; color: var(--tenue); }
+  .vacio { color: var(--tenue); }
+</style>
+</head>
+<body>
+<main id="vista" aria-live="polite">
+  <noscript><p>Este atajo necesita JavaScript.</p><p><a href="/">Ir al inicio</a></p></noscript>
+</main>
+<script>
+(() => {
+  'use strict';
+  const vista = document.getElementById('vista');
+  let datos = null;            // { espera, predeterminado, lugares: Map(id en minúsculas → { id, url, titulo, grupo }) }
+  let temporizador = 0;
+
+  const urlValida = (u) => typeof u === 'string' && /^(https?:\/\/|\/(?!\/))/i.test(u.trim());
+  const host = (u) => { try { return new URL(u, location.href).host; } catch { return u; } };
+
+  // el atajo viene del hash (#m0) o, si no hay, de la consulta (?m0 o ?id=m0)
+  function leerId() {
+    const crudo = location.hash ? location.hash.slice(1) : location.search.replace(/^\?(?:id=)?/, '').split('&')[0];
+    try { return decodeURIComponent(crudo).trim(); } catch { return crudo.trim(); }
+  }
+
+  // helper de DOM: todo el texto entra como textContent (nada del JSON ni de la URL se interpreta como HTML)
+  function el(tag, props = {}, ...hijos) {
+    const e = Object.assign(document.createElement(tag), props);
+    e.append(...hijos.filter((h) => h != null));
+    return e;
+  }
+  const mostrar = (titulo, ...nodos) => { document.title = titulo; vista.replaceChildren(...nodos.filter(Boolean)); };
+
+  async function cargar() {
+    const r = await fetch('lugares.json', { cache: 'no-cache' });
+    if (!r.ok) throw new Error('lugares.json: HTTP ' + r.status);
+    const j = await r.json();
+    const aj = j.ajustes || {};
+    const lugares = new Map();
+    for (const [id, v] of Object.entries(j.lugares || {})) {
+      const o = typeof v === 'string' ? { url: v } : (v || {});
+      if (!urlValida(o.url)) { console.warn('[ir] el atajo «' + id + '» no tiene una URL válida: se ignora'); continue; }
+      lugares.set(id.toLowerCase(), { id, url: o.url.trim(), titulo: o.titulo || '', grupo: o.grupo || '' });
+    }
+    datos = {
+      espera: Number.isFinite(aj.espera) ? Math.max(0, aj.espera) : 2000,
+      predeterminado: urlValida(aj.predeterminado) ? aj.predeterminado.trim() : '/',
+      lugares,
+    };
+  }
+
+  // ---- vista: redirigir ----
+  function irA(lugar) {
+    const nombre = lugar.titulo || host(lugar.url);
+    const barra = el('div', { className: 'barra' }, el('i'));
+    barra.setAttribute('aria-hidden', 'true');
+    barra.firstChild.style.animationDuration = datos.espera + 'ms';
+    const cancelar = el('button', { type: 'button', textContent: 'Cancelar' });
+    const contenedor = el('div', {},
+      el('p', { className: 'pre', textContent: 'EN BREVE IRÁS A' }),
+      el('h1', {}, el('a', { href: lugar.url, textContent: nombre })),
+      el('p', { className: 'url', textContent: lugar.url }),
+      barra,
+      el('p', { className: 'acciones' }, el('a', { className: 'boton', href: lugar.url, textContent: 'Ir ahora' }), cancelar));
+    mostrar('Yendo a ' + nombre, contenedor);
+
+    // replace: el redireccionador no queda en el historial (el botón «atrás» no rebota)
+    temporizador = setTimeout(() => location.replace(lugar.url), datos.espera);
+    cancelar.addEventListener('click', () => {
+      clearTimeout(temporizador);
+      contenedor.className = 'cancelada';
+      contenedor.querySelector('.pre').textContent = 'REDIRECCIÓN CANCELADA';
+      cancelar.replaceWith(el('a', { className: 'boton', href: location.pathname, textContent: 'Ver todos los atajos' }));
+    });
+  }
+
+  // ---- vista: lista de atajos ----
+  function lista(mensaje, clase = 'aviso') {
+    const grupos = new Map();
+    for (const l of datos.lugares.values()) {
+      if (!grupos.has(l.grupo)) grupos.set(l.grupo, []);
+      grupos.get(l.grupo).push(l);
+    }
+    const nodos = [];
+    for (const [grupo, items] of grupos) {
+      if (grupo) nodos.push(el('h2', { textContent: grupo }));
+      nodos.push(el('ul', {}, ...items.map((l) => el('li', {},
+        el('a', { href: l.url, rel: 'noopener noreferrer' }, l.titulo || l.id, el('small', { textContent: host(l.url) })),
+        el('code', { textContent: '#' + l.id })))));
+    }
+    mostrar('Atajos',
+      el('h1', { textContent: 'Atajos' }),
+      mensaje ? el('p', { className: clase, textContent: mensaje }) : null,
+      el('p', { className: 'acciones' }, el('a', { className: 'boton', href: datos.predeterminado, textContent: 'Ir al inicio' })),
+      el('div', { className: 'lista' }, ...(nodos.length ? nodos : [el('p', { className: 'vacio', textContent: 'No hay atajos definidos.' })])));
+  }
+
+  function error(e) {
+    const local = location.protocol === 'file:';
+    mostrar('Atajos',
+      el('h1', { textContent: 'No se pudo cargar la lista' }),
+      el('p', { className: 'error', textContent: String(e && e.message || e) }),
+      local ? el('p', { className: 'aviso', textContent: 'Abrí la página desde un servidor local (./base/clmweb open): fetch no funciona desde file://.' }) : null,
+      el('p', { className: 'acciones' }, el('a', { className: 'boton', href: '/', textContent: 'Ir al inicio' })));
+  }
+
+  // ---- decide qué mostrar ----
+  function iniciar() {
+    clearTimeout(temporizador);
+    if (!datos) return;
+    const id = leerId();
+    if (id === '_') return irA({ url: datos.predeterminado, titulo: '' });
+    const lugar = id && datos.lugares.get(id.toLowerCase());
+    if (lugar) return irA(lugar);
+    lista(id ? 'No existe el atajo «' + id + '».' : '');
+  }
+
+  addEventListener('hashchange', iniciar);
+  cargar().then(iniciar).catch(error);
+})();
+</script>
+</body>
+</html>

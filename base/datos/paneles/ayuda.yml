@@ -1,0 +1,10 @@
+---
+# Panel suelto: sin botón. Abrir con:  ayuda.ABR   (o en la URL: #ayuda.ABR)
+titulo: 'Ayuda'
+posicion: 'centro'
+md: |
+  - <kbd>Alt+Esc</kbd> editor pila-web · <kbd>Alt+Enter</kbd> evaluar · <kbd>Alt+U</kbd> fijar URL
+  - `PIL` muestra la pila · `AYU` lista las palabras
+  - `ayuda.izquierda.POS` cambia la posición de un panel
+  - `ayuda.80.MAX` agranda un panel al 80% de la ventana (`ayuda.0.MAX` lo restaura); el botón ⤢ de la cabecera alterna el máximo
+  - `AYU` lista todas las palabras; `QUE.FOC` explica una. `elementos.ABR` abre un panel para probar EL, YO, FOC y VAL

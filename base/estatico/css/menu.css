@@ -1,0 +1,32 @@
+/* Menú lateral disimulado: una franja angosta con marcas finas. Sólo al pasar por esa
+   franja se despliega (y se pliega al salir). Lado: datos/sitio.yml → menu.lado */
+.menu {
+  position: fixed; top: 0; bottom: 0; z-index: 50;
+  width: 2.2rem; display: flex; align-items: center; overflow: hidden;   /* la zona activa es sólo la franja */
+  transition: width .25s ease, background .25s ease;
+}
+.menu-izq .menu { left: 0; }
+.menu-der .menu { right: 0; justify-content: flex-end; }
+
+.menu ul { list-style: none; margin: 0; padding: 0 0 0 .8rem; display: flex; flex-direction: column; gap: .15rem; }
+.menu-der .menu ul { padding: 0 .8rem 0 0; }
+.menu a { display: flex; align-items: baseline; gap: .9rem; padding: .4rem 0; color: var(--tenue); font-size: .8rem; white-space: nowrap; text-decoration: none; }
+.menu-der .menu a { flex-direction: row-reverse; }
+.menu i { align-self: center; flex: none; display: block; width: .6rem; height: 2px; border-radius: 2px; background: var(--tenue); opacity: .45; transition: width .25s, opacity .25s, background .25s; }
+.menu a.actual i { width: 1.2rem; background: var(--acento); opacity: 1; }
+.menu a:hover { color: var(--acento); }
+.menu a:hover i { background: var(--acento); opacity: 1; }
+
+.menu .t, .menu .r { opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
+.menu-izq .menu .t, .menu-izq .menu .r { transform: translateX(-.5rem); }
+.menu-der .menu .t, .menu-der .menu .r { transform: translateX(.5rem); }
+.menu a.actual .t { color: var(--acento); }
+.menu .r { font-size: .7rem; }
+
+.menu:hover, .menu.abierto, .menu:has(:focus-visible) { width: min(20rem, 85vw); }
+.menu-izq .menu:hover, .menu-izq .menu.abierto, .menu-izq .menu:has(:focus-visible) { background: linear-gradient(90deg, rgba(6, 8, 12, .96) 55%, transparent); }
+.menu-der .menu:hover, .menu-der .menu.abierto, .menu-der .menu:has(:focus-visible) { background: linear-gradient(270deg, rgba(6, 8, 12, .96) 55%, transparent); }
+.menu:hover .t, .menu.abierto .t, .menu:has(:focus-visible) .t { opacity: 1; transform: none; pointer-events: auto; }
+.menu:hover .r, .menu.abierto .r, .menu:has(:focus-visible) .r { opacity: .6; transform: none; }
+
+@media (max-width: 700px) { .menu { width: 1.8rem; } .menu ul { padding-left: .55rem; } .menu-der .menu ul { padding: 0 .55rem 0 0; } }

@@ -1,0 +1,32 @@
+---
+titulo: 'Exploraciones'
+resumen: 'experimentos'
+tipo: 'texto'
+md: |
+  ## Livecoding
+
+  - [Curso de performance telemático y audiovisual en Estuary](/ir/#lc){: target=_blank}
+
+
+  ## Matemática
+
+  - [Exploraciones con números](https://github.com/caalma/exploraciones_con_numeros){: target=_blank}
+
+  ## Programación
+
+  - [Markdown en los artículos: guía de sintaxis]({{ cfg.base }}articulos/markdown.html) (artículo)
+  - [pila-web, el lenguaje de la página]({{ cfg.base }}articulos/pila-web.html) (artículo)
+
+
+paneles:
+  - id: pila-web-demo
+    titulo: 'Probar el pila-web acá'
+    posicion: 'derecha'
+    md: |
+      Esta web entiende un lenguaje de pila (RPN): **pila-web**. Probá estas expresiones:
+
+      <p><a href="#" data-pila-web-click="~1a1030.fondo.VAR">fondo violeta</a></p>
+      <p><a href="#" data-pila-web-click="~0b0d12.fondo.VAR">fondo original</a></p>
+      <p>2 × 3 + 4 = <b data-pila-web-mostrar="2.3.MUL.4.SUM.RET">…</b></p>
+
+      Con <kbd>Alt+Esc</kbd> abrís el editor y con <kbd>Alt+Enter</kbd> evaluás. <kbd>Alt+U</kbd> fija el estado en la URL.

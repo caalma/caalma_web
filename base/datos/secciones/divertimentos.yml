@@ -1,0 +1,20 @@
+---
+titulo: 'Divertimentos'
+resumen: 'juegos'
+tipo: 'lista'                  # base/plantillas/secciones/lista.html
+items:
+  - titulo: 'CruzaPalabras'
+    url: 'https://caalma.github.io/cruza_palabras/'
+    nota: 'Relaciona, azarozamente, una frase con las palabras de la base de datos.'
+  - titulo: 'Figuras del Tangram Chino'
+    url: 'https://caalma.github.io/tangram_figuras/'
+    target: 'tangram'            # pestaña con nombre: se reutiliza
+    nota: 'Visualiza figuras del Tangram y muestra sus soluciones.'
+    clase: 'destacado'           # clase CSS en el <li>
+  - titulo: 'Natalicio emprendedor'
+    url: 'https://caalma.github.io/natalicio_emprendedor/'
+    nota: 'Genera títulos, humorísticos, para emprendimientos.'
+  - titulo: 'Refranero Mix'
+    url: 'https://caalma.giThub.io/refranero_mix/'
+    target: '_blank'
+    nota: 'Mix aleatorio de refranes en castellano.'

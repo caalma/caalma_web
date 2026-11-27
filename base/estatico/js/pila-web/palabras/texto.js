@@ -1,0 +1,19 @@
+export default {
+  nombre: 'texto',
+  ayuda: {
+    CAT: 'a b → ab       une dos textos',
+    REP: 'a n → a×n      repite un texto n veces',
+    SPC: '→ " "          apila un espacio',
+    MAY: 'a → A          pasa a mayúsculas',
+    MNS: 'a → a          pasa a minúsculas',
+    LEN: 'a → n          cantidad de caracteres',
+  },
+  palabras: {
+    CAT: (vm) => { vm.necesitar(2); const b = vm.pop(), a = vm.pop(); vm.push(`${a}${b}`); },
+    REP: (vm) => { vm.necesitar(2); const n = vm.num(vm.pop()), a = vm.pop(); vm.push(String(a).repeat(n)); },
+    SPC: (vm) => { vm.push(' '); },
+    MAY: (vm) => { vm.necesitar(1); vm.push(String(vm.pop()).toUpperCase()); },
+    MNS: (vm) => { vm.necesitar(1); vm.push(String(vm.pop()).toLowerCase()); },
+    LEN: (vm) => { vm.necesitar(1); vm.push(String(vm.pop()).length); },
+  },
+};

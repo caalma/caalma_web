@@ -1,0 +1,19 @@
+---
+# Panel suelto para probar las palabras de elementos. Abrir con:  elementos.ABR
+titulo: 'Probar EL, YO, FOC y VAL'
+posicion: 'derecha'
+md: |
+  Un campo con una expresión en `data-pila-web-input`: cada vez que escribís, se evalúa
+  `demo-eco.YO.VAL.TXE` (YO es el campo, VAL su texto, TXE lo escribe en el elemento `demo-eco`).
+
+  <input id="demo-campo" type="text" placeholder="escribí algo" data-pila-web-input="demo-eco.YO.VAL.TXE">
+
+  Eco: <b id="demo-eco">…</b>
+
+  <button type="button" data-pila-web-click="demo-campo.FOC">enfocar el campo</button>
+  <button type="button" data-pila-web-click="demo-eco.demo-campo.VAL.MAY.TXE">eco en mayúsculas</button>
+  <button type="button" data-pila-web-click="demo-eco.demo-campo.EL.ID.TXE">ver su id</button>
+  <button type="button" data-pila-web-click="demo-eco.YO.LEE.TXE">leer este botón</button>
+
+  Desde el editor (<kbd>Alt+Esc</kbd>) probá <code>demo-campo.EL.PIL</code> o
+  <code>elementos.ABR.demo-campo.FOC</code>, y <code>AYU</code> o <code>QUE.FOC</code> para ver la ayuda.

@@ -1,0 +1,10 @@
+---
+titulo: 'Contactos'
+resumen: 'escribime'
+tipo: 'texto'
+md: |
+  - [web](https://caalma.net.ar/){: target=_blank}
+  - [linktree](https://linktr.ee/caalmaarg){: target=_blank}
+  - [telegram](https://t.me/c_a_a_l_m_a){: target=_blank}
+  - [instagram](https://www.instagram.com/c_a_a_l_m_a/){: target=_blank}
+  - [github]({{ cfg.urls.repositorio }}){: target=_blank}

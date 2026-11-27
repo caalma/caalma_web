@@ -1,0 +1,43 @@
+---
+titulo: 'Útiles'
+resumen: 'herramientas'
+tipo: 'texto'
+md: ''
+
+# Paneles superponibles: cada uno aparece como botón en la sección.
+paneles:
+  - id: utiles-livecoding
+    titulo: 'Livecoding'
+    md: |
+      - [Editor para Livecoding](https://github.com/caalma/caalma-livecoding_editor){: target=_blank}
+      - [LCVD - Livecoding Visor Disociado](https://github.com/caalma/lcvd){: target=_blank}
+      - [Strudel - MiniEditor](https://github.com/caalma/strudel-mini-editor){: target=_blank}
+
+  - id: utiles-ludicos
+    titulo: 'Lúdicos'
+    md: |
+      - [Editor simple para ANAGRAMAS](https://caalma.github.io/ed_anagramas/){: target=_blank}
+      - [Editor simple para PALÍNDROMOS](https://caalma.github.io/ed_palindromos/){: target=_blank}
+
+  - id: utiles-entorno
+    titulo: 'Entorno'
+    md: |
+      - [Configuración personal para Emacs](https://github.com/caalma/emacs_configuracion-caalma){: target=_blank}
+      - [fname_normalize](https://github.com/caalma/fname_normalize){: target=_blank}
+      - [Reproductor de Video Disociado](https://github.com/caalma/reproductor_video_disociado){: target=_blank}
+      - [Command Call Server](https://github.com/caalma/server_call_commands){: target=_blank}
+      - [Organizador de Web-Apps](https://github.com/caalma/owa){: target=_blank}
+
+  - id: utiles-editorial
+    titulo: 'Editorial'
+    md: |
+      - [Imágenes a pdf](https://github.com/caalma/imagenes_a_pdf){: target=_blank}
+      - [Plantilla estática para página web](https://github.com/caalma/plantilla_pagina_estatica){: target=_blank}
+      - [Plantilla para cupones](https://github.com/caalma/plantilla_para_cupones){: target=_blank}
+      - [Tabla Comparativa](https://caalma.github.io/tabla_comparativa/){: target=_blank}
+      - [Colores en Hexadecimal con 3 signos](https://caalma.github.io/color_hexadecimal_3_signos/){: target=_blank}
+
+  - id: utiles-otros
+    titulo: 'Otros'
+    md: |
+      - [Cuadernos Interactivos: Útiles](https://github.Com/caalma/ci-utiles){: target=_blank}
