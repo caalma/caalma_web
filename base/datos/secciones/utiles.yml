@@ -12,6 +12,9 @@ paneles:
       - [Editor para Livecoding](https://github.com/caalma/caalma-livecoding_editor){: target=_blank}
       - [LCVD - Livecoding Visor Disociado](https://github.com/caalma/lcvd){: target=_blank}
       - [Strudel - MiniEditor](https://github.com/caalma/strudel-mini-editor){: target=_blank}
+      - [SideEdit](https://github.com/caalma/sideedit){: target=_blank} <small>Utilidad para edición lateral o remota de aplicaciones web.</small>
+      - [Almacenamiento externo de fotogramas para Hydra](https://github.com/caalma/almacenamiento_externo_de_fotogramas_para_hydra){: target=_blank}
+      - [Estilo visual y funcionalidades para personalizar Estuary.](https://github.com/caalma/estuary-personalizacion){: target=_blank}
 
   - id: utiles-ludicos
     titulo: 'Lúdicos'
@@ -27,6 +30,9 @@ paneles:
       - [Reproductor de Video Disociado](https://github.com/caalma/reproductor_video_disociado){: target=_blank}
       - [Command Call Server](https://github.com/caalma/server_call_commands){: target=_blank}
       - [Organizador de Web-Apps](https://github.com/caalma/owa){: target=_blank}
+      - [FotoNota](https://github.com/caalma/fotonota){: target=_blank} <small>Minimal app for take photos of notes.</small>
+      - [OrgLens](https://github.com/caalma/orglens){: target=_blank} <small>Herramienta de línea de comandos diseñada para analizar, buscar y convertir archivos '.org'.</small>
+      - [repl-mode](https://github.com/caalma/repl-mode){: target=_blank} <small>Modo interactivo para Emacs que simula un Read-Eval-Print-Loop utilizando un ejecutable externo.</small>
 
   - id: utiles-editorial
     titulo: 'Editorial'
@@ -36,6 +42,24 @@ paneles:
       - [Plantilla para cupones](https://github.com/caalma/plantilla_para_cupones){: target=_blank}
       - [Tabla Comparativa](https://caalma.github.io/tabla_comparativa/){: target=_blank}
       - [Colores en Hexadecimal con 3 signos](https://caalma.github.io/color_hexadecimal_3_signos/){: target=_blank}
+
+  - id: utiles-lenguajes
+    titulo: 'Lenguajes'
+    md: |
+      - [RPN eval](https://github.com/caalma/rpn_eval){: target=_blank} <small>Evaluador de expresiones RPN. Con aplicaciones de audio y calculadora.</small>
+      - [Papri.](https://github.com/caalma/papri){: target=_blank}
+
+  - id: utiles-sonoro
+    titulo: 'Sonoro'
+    md: |
+      - [ganuritov](https://github.com/caalma/ganuritov){: target=_blank} <small>Página web del proyecto GANURITOV para la radio online de audio generativo</small>
+      - [Pila LC Bytebeat](https://github.com/caalma/pila-lc-bytebeat){: target=_blank} <small>Motor para síntesis generativa de audio mediante código con sintaxis rpn. Orientado para prácticas de codificación en vivo.</small>
+      - [text-cb-sound in browser](https://github.com/caalma/text-cb-sound-in-browser){: target=_blank} <small>Sintetizador de sonido en base a texto, mediante ritmos inspirados en patrones de códigos de barra, entre otros.</small>
+      - [Dibujar-Sonar visual-synth](https://github.com/caalma/dibujar-sonar_visual-synth){: target=_blank} <small>Webapp para sintetizar sonido desde imágenes. Admite múltiples pistas, persistencia y registro de audio.</small>
+      - [Secuenciador pixelar](https://github.com/caalma/secuenciador-pixelar){: target=_blank} <small>Sintetizador y secuenciador en base a matriz de pixeles. Acepta múltiples pistas.</small>
+      - [Ondas continuas](https://github.com/caalma/ondas-continuas){: target=_blank} <small>Aplicación de browser para la síntesis de sonido controlado por código javascript.</small>
+      - [Sinestesia Theremin](https://github.com/caalma/sinestesia-theremin){: target=_blank} <small>Experimento de generación de audio interactivo desde una terminal de linux.</small>
+      - [AUDio Player Visualizer](https://github.com/caalma/audpv){: target=_blank}
 
   - id: utiles-otros
     titulo: 'Otros'
